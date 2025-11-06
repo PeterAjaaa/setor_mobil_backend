@@ -1,0 +1,33 @@
+# Git-related files
+.git
+.gitignore
+
+# Go build artifacts and cache
+*.o
+*.so
+*.a
+*.exe
+vendor/
+
+# IDE and editor specific files
+.idea/
+.vscode/
+*.swp
+*.bak
+*~
+
+# Temporary files and logs
+tmp/
+log/
+*.log
+
+# Environment files
+.env
+.env.*
+
+# Docker-related files (except Dockerfile and .dockerignore themselves)
+Dockerfile
+.dockerignore
+
+# Binaries built locally (if you're building inside the container)
+setor-mobil-backend
