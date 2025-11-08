@@ -2,12 +2,30 @@ package router
 
 import (
 	"net/http"
+	"os"
 
+	"github.com/PeterAjaaa/setor_mobil_backend/helper"
 	"github.com/PeterAjaaa/setor_mobil_backend/logger"
+	"github.com/PeterAjaaa/setor_mobil_backend/middleware"
 	"github.com/PeterAjaaa/setor_mobil_backend/services"
 )
 
+var NewMux *http.ServeMux
+
 func Router() {
-	logger.LOG.Debug("Calling main() function")
-	http.HandleFunc("/users", services.GetUsers)
+	logger.LOG.Info("Setting up routes...")
+
+	key, err := helper.ReadEnvIfExists("JWT_KEY")
+	if err != nil {
+		logger.LOG.Error(err.Error())
+		os.Exit(1)
+	}
+
+	authHandler := &services.UserHandler{Auth: &middleware.AuthHandler{JwtKey: []byte(key), DB: helper.GetDB()}}
+	NewMux = http.NewServeMux()
+
+	NewMux.Handle("/users/{id}", authHandler.Auth.AuthMiddleware(http.HandlerFunc(authHandler.GetUserById)))
+
+	NewMux.HandleFunc("/register", services.RegisterUser)
+	NewMux.HandleFunc("/login", services.LoginUser)
 }

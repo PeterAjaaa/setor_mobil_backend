@@ -9,12 +9,13 @@ type User struct {
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 	Name       string
+	Password   string
 	Birthdate  time.Time
 	Birthplace string
 	Gender     string
 	Address    string
-	RT         int
-	RW         int
+	RT         string
+	RW         string
 	Keluarahan string
 	Kecamatan  string
 	Occupation string

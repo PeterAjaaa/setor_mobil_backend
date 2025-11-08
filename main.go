@@ -30,5 +30,5 @@ func main() {
 	}
 
 	logger.LOG.Info(fmt.Sprintf("Serving API at %s", port))
-	http.ListenAndServe(":"+port, nil)
+	http.ListenAndServe(":"+port, router.NewMux)
 }

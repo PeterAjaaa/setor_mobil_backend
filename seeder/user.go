@@ -10,6 +10,7 @@ import (
 )
 
 func seedUserTable(db *gorm.DB) {
+	logger.LOG.Info("Seeding User table...")
 	var users []models.User
 	txErr := db.Transaction(func(tx *gorm.DB) error {
 		users = append(users, models.User{
@@ -18,8 +19,8 @@ func seedUserTable(db *gorm.DB) {
 			Birthplace: "Bandung",
 			Gender:     "Laki-laki",
 			Address:    "Jl. Mawar No. 20",
-			RT:         002,
-			RW:         003,
+			RT:         "002",
+			RW:         "003",
 			Keluarahan: "Kesana",
 			Kecamatan:  "Kemari",
 			Occupation: "Karyawan",
@@ -30,8 +31,8 @@ func seedUserTable(db *gorm.DB) {
 			Birthplace: "Jawa Tengah",
 			Gender:     "Perempuan",
 			Address:    "Jl. Melati No. 50",
-			RT:         010,
-			RW:         001,
+			RT:         "010",
+			RW:         "001",
 			Keluarahan: "Disini",
 			Kecamatan:  "Disana",
 			Occupation: "Pelajar",
