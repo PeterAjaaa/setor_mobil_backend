@@ -4,6 +4,7 @@ services:
     ports:
       - "${HOST_PORT}:${CONTAINER_PORT}"
     environment:
+      - JWT_KEY=${JWT_KEY}
       - LOGLEVEL=${LOGLEVEL}
       - HOST_PORT=${HOST_PORT}
       - CONTAINER_PORT=${CONTAINER_PORT}
