@@ -7,4 +7,5 @@ import (
 
 func DoMigrateTables() {
 	helper.MigrateTable(&models.Users{})
+	helper.MigrateTable(&models.Cars{})
 }
