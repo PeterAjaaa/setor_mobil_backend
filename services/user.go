@@ -21,7 +21,7 @@ func (h *UserHandler) GetUserById(w http.ResponseWriter, r *http.Request) {
 	logger.LOG.Debug("Getting users in GetUserById() function...")
 
 	w.Header().Set("Content-type", "application/json")
-	var user models.User
+	var user models.Users
 	var response []dto.UserResponseRequest
 
 	result := h.Auth.DB.First(&user, r.PathValue("id"))
@@ -62,7 +62,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := models.User{
+	user := models.Users{
 		Name:       req.Name,
 		Email:      req.Email,
 		Password:   hashedPassword,
@@ -110,7 +110,7 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var user models.User
+	var user models.Users
 	db := helper.GetDB()
 	if err := db.Where("email = ?", req.Email).First(&user).Error; err != nil {
 		http.Error(w, "Invalid email or password", http.StatusUnauthorized)

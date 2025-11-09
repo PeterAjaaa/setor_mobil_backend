@@ -13,7 +13,7 @@ import (
 
 var jwtKey []byte
 
-func GenerateJWT(user models.User) (string, error) {
+func GenerateJWT(user models.Users) (string, error) {
 	logger.LOG.Debug(fmt.Sprintf("Generating JWT for user %s", user.Name))
 
 	key, err := helper.ReadEnvIfExists("JWT_KEY")

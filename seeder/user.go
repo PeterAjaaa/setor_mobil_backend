@@ -11,9 +11,9 @@ import (
 
 func seedUserTable(db *gorm.DB) {
 	logger.LOG.Info("Seeding User table...")
-	var users []models.User
+	var users []models.Users
 	txErr := db.Transaction(func(tx *gorm.DB) error {
-		users = append(users, models.User{
+		users = append(users, models.Users{
 			Name:       "Ujang",
 			Birthdate:  time.Date(2025, time.November, 11, 8, 0, 0, 0, time.Now().Location()),
 			Birthplace: "Bandung",
@@ -25,7 +25,7 @@ func seedUserTable(db *gorm.DB) {
 			Kecamatan:  "Kemari",
 			Occupation: "Karyawan",
 			Email:      "test@email.tld",
-		}, models.User{
+		}, models.Users{
 			Name:       "Dewi",
 			Birthdate:  time.Date(2025, time.November, 5, 3, 0, 0, 0, time.Now().Location()),
 			Birthplace: "Jawa Tengah",

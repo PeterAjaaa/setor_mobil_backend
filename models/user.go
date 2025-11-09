@@ -1,10 +1,11 @@
 package models
 
 import (
+	"reflect"
 	"time"
 )
 
-type User struct {
+type Users struct {
 	ID         uint `gorm:"primaryKey"`
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
@@ -20,4 +21,8 @@ type User struct {
 	Kecamatan  string
 	Occupation string
 	Email      string
+}
+
+func (user Users) TableName() string {
+	return reflect.TypeOf(user).Name()
 }
