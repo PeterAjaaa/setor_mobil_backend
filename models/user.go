@@ -15,8 +15,8 @@ type Users struct {
 	Birthplace string
 	Gender     string
 	Address    string
-	RT         string
-	RW         string
+	RT         uint16
+	RW         uint16
 	Keluarahan string
 	Kecamatan  string
 	Occupation string

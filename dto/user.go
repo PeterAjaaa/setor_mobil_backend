@@ -12,8 +12,8 @@ type UserCreationRequest struct {
 	Gender     Genders   `json:"gender" validate:"required,oneof=Laki-laki Perempuan"`
 	// Assuming the possible shortest address as 'Jl a no 1'
 	Address    string `json:"address" validate:"required,min=9"`
-	RT         string `json:"rt" validate:"required,min=1,max=3"`
-	RW         string `json:"rw" validate:"required,min=1,max=3"`
+	RT         uint16 `json:"rt" validate:"required,min=1,max=3"`
+	RW         uint16 `json:"rw" validate:"required,min=1,max=3"`
 	Keluarahan string `json:"kelurahan" validate:"required,min=2"`
 	Kecamatan  string `json:"kecamatan" validate:"required,min=2"`
 	Occupation string `json:"pekerjaan" validate:"required,min=2"`
@@ -22,7 +22,7 @@ type UserCreationRequest struct {
 }
 
 type UserResponseRequest struct {
-	ID    string `json:"id"`
+	ID    uint   `json:"id"`
 	Name  string `json:"name"`
 	Email string `json:"email"`
 }
