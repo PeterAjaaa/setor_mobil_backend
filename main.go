@@ -17,13 +17,12 @@ func main() {
 	logger.LOG.Debug("Calling main() function")
 
 	helper.InitDB()
-
-	migration.MigrateUserTable()
+	migration.DoMigrateTables()
 	seeder.SeedDatabase()
+
 	router.Router()
 
 	port, err := helper.ReadEnvIfExists("HOST_PORT")
-
 	if err != nil {
 		logger.LOG.Error(err.Error())
 		os.Exit(1)
