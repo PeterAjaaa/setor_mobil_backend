@@ -7,6 +7,9 @@ import (
 
 func SeedDatabase() {
 	logger.LOG.Info("Seeding database...")
+
 	db := helper.GetDB()
-	seedUserTable(db)
+
+	helper.SeedTable(db, userSeed)
+	helper.SeedTable(db, carSeed)
 }
