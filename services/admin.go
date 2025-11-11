@@ -123,7 +123,7 @@ func (h *ServiceHandler) GetAdminById(w http.ResponseWriter, r *http.Request) {
 
 	logger.LOG.Debug(fmt.Sprintf("Getting admin by ID:%d in GetAdminById() function...", admin.ID))
 
-	result := h.Auth.DB.Preload("CarsCreated").First(&admin, r.PathValue("id"))
+	result := h.Auth.DB.Preload("CarsCreated").Preload("MotorcyclesCreated").First(&admin, r.PathValue("id"))
 
 	if result.Error != nil {
 		http.Error(w, result.Error.Error(), http.StatusInternalServerError)
