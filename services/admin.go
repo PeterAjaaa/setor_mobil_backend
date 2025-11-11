@@ -139,10 +139,11 @@ func (h *ServiceHandler) GetAdminById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response = dto.AdminResponseRequest{
-		ID:          admin.ID,
-		Name:        admin.Name,
-		Email:       admin.Email,
-		CarsCreated: admin.CarsCreated,
+		ID:                 admin.ID,
+		Name:               admin.Name,
+		Email:              admin.Email,
+		CarsCreated:        admin.CarsCreated,
+		MotorcyclesCreated: admin.MotorcyclesCreated,
 	}
 
 	json.NewEncoder(w).Encode(response)
