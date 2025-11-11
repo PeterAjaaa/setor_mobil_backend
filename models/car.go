@@ -17,6 +17,8 @@ type Cars struct {
 	Status          string
 	Description     string
 	ImageURL        string
+	// FK Field
+	CreatedByID uint
 }
 
 func (car Cars) TableName() string {
