@@ -10,6 +10,6 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o binary
+RUN go build -ldflags="-s -w" -o binary
 
 ENTRYPOINT [ "/app/binary" ]
