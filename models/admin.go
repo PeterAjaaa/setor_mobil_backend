@@ -6,16 +6,15 @@ import (
 )
 
 type Admins struct {
-	ID          uint `gorm:"primaryKey"`
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	Name        string
-	Email       string
-	Password    string
-	DateJoined  time.Time
-	CarsCreated *[]Cars `gorm:"foreignKey:CreatedByID"`
-	// TODO: Turn this back on when Bikes are implemented
-	// BikesCreated []Bikes
+	ID                 uint `gorm:"primaryKey"`
+	CreatedAt          time.Time
+	UpdatedAt          time.Time
+	Name               string
+	Email              string
+	Password           string
+	DateJoined         time.Time
+	CarsCreated        *[]Cars        `gorm:"foreignKey:CreatedByID"`
+	MotorcyclesCreated *[]Motorcycles `gorm:"foreignKey:CreatedByID"`
 }
 
 func (admin Admins) TableName() string {
