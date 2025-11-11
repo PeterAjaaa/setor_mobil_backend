@@ -9,8 +9,9 @@ type AdminCreationRequest struct {
 }
 
 type AdminResponseRequest struct {
-	ID          uint           `json:"id"`
-	Name        string         `json:"name"`
-	Email       string         `json:"email"`
-	CarsCreated *[]models.Cars `json:"cars_created"`
+	ID                 uint                  `json:"id"`
+	Name               string                `json:"name"`
+	Email              string                `json:"email"`
+	CarsCreated        *[]models.Cars        `json:"cars_created"`
+	MotorcyclesCreated *[]models.Motorcycles `json:"motorcycles_created"`
 }
