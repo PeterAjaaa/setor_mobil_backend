@@ -24,10 +24,15 @@ func Router() {
 	authHandler := services.ServiceHandler{Auth: &middleware.AuthHandler{JwtKey: []byte(key), DB: helper.GetDB()}}
 	NewMux = http.NewServeMux()
 
+	NewMux.HandleFunc("/register/admin", services.RegisterAdmin)
+	NewMux.HandleFunc("/login/admin", services.LoginAdmin)
+	NewMux.Handle("/admins/{id}", authHandler.Auth.AuthMiddleware(http.HandlerFunc(authHandler.GetAdminById)))
+
 	NewMux.HandleFunc("/register", services.RegisterUser)
 	NewMux.HandleFunc("/login", services.LoginUser)
 	NewMux.Handle("/users/{id}", authHandler.Auth.AuthMiddleware(http.HandlerFunc(authHandler.GetUserById)))
 
 	NewMux.Handle("/cars", authHandler.Auth.AuthMiddleware(http.HandlerFunc(authHandler.GetAllCars)))
 	NewMux.Handle("/cars/{id}", authHandler.Auth.AuthMiddleware(http.HandlerFunc(authHandler.GetCarById)))
+	NewMux.Handle("/cars/create", authHandler.Auth.AuthMiddleware(http.HandlerFunc(authHandler.CreateNewCar)))
 }
