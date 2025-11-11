@@ -13,7 +13,13 @@ import (
 )
 
 func (h *ServiceHandler) GetUserById(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-type", "application/json")
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
 	var user models.Users
 	var response dto.UserResponseRequest
 
@@ -45,16 +51,22 @@ func (h *ServiceHandler) GetUserById(w http.ResponseWriter, r *http.Request) {
 }
 
 func RegisterUser(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
 	logger.LOG.Debug("Registering user in RegisterUser() function...")
 
 	var req dto.UserCreationRequest
+
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		logger.LOG.Error(err.Error())
 		return
 	}
 
-	hashedPassword, err := HashPassword(req.Password)
+	hashedPassword, err := helper.HashPassword(req.Password)
 	if err != nil {
 		http.Error(w, "Failed to hash password", http.StatusInternalServerError)
 		logger.LOG.Error(err.Error())
@@ -101,6 +113,11 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func LoginUser(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
 	logger.LOG.Debug("Logging in user in LoginUser() function...")
 
 	var req dto.LoginRequest
@@ -111,6 +128,7 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var user models.Users
+
 	db := helper.GetDB()
 	if err := db.Where("email = ?", req.Email).First(&user).Error; err != nil {
 		http.Error(w, "Invalid email or password", http.StatusUnauthorized)
@@ -118,12 +136,12 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !CheckPasswordHash(req.Password, user.Password) {
+	if !helper.CheckPasswordHash(req.Password, user.Password) {
 		http.Error(w, "Invalid email or password", http.StatusUnauthorized)
 		return
 	}
 
-	token, err := GenerateJWT(user)
+	token, err := helper.GenerateJWT(user)
 	if err != nil {
 		http.Error(w, "Failed to create token", http.StatusInternalServerError)
 		logger.LOG.Error(err.Error())
