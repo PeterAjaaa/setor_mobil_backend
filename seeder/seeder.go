@@ -10,8 +10,11 @@ func SeedDatabase() {
 
 	db := helper.GetDB()
 
+	// SEED ORDER:
+	// USER -> ADMIN -> CAR / MOTORCYCLE -> ORDER -> RATING
 	helper.SeedTable(db, userSeed)
-	helper.SeedTable(db, carSeed)
 	helper.SeedTable(db, adminSeed)
+	helper.SeedTable(db, carSeed)
 	helper.SeedTable(db, motorcycleSeed)
+	helper.SeedTable(db, orderSeed)
 }
