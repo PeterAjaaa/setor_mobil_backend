@@ -1,7 +1,7 @@
 package models
 
 type APIResponse struct {
-	Status  string `json:"status"`
+	Status  int    `json:"status"`
 	Message string `json:"message,omitempty"`
 	Data    any    `json:"data,omitempty"`
 }
