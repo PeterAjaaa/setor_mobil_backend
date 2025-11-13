@@ -14,10 +14,10 @@ type Orders struct {
 	PickupLocation string
 	Price          uint32
 	Status         string
-	Rating         *uint
-	CarID          *uint `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	MotorcycleID   *uint `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	CarID          *uint
+	MotorcycleID   *uint
 	UserID         uint
+	Rating         *Ratings `gorm:"foreignKey:OrderID"`
 }
 
 func (order Orders) TableName() string {
