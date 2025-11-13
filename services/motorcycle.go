@@ -16,7 +16,7 @@ import (
 
 func (h *ServiceHandler) GetMotorcyleById(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		helper.HttpErrorHelper(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
 		return
 	}
 
@@ -30,15 +30,15 @@ func (h *ServiceHandler) GetMotorcyleById(w http.ResponseWriter, r *http.Request
 	motorID, err := strconv.ParseUint(r.PathValue("id"), 10, 64)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		helper.HttpErrorHelper(w, http.StatusBadRequest, err.Error(), nil)
 		logger.LOG.Error(err.Error())
 		return
 	}
 
-	result := h.DB.First(&motor, motorID)
+	result := h.DB.Preload("Orders").Preload("Ratings").First(&motor, motorID)
 
 	if result.Error != nil {
-		http.Error(w, result.Error.Error(), http.StatusInternalServerError)
+		helper.HttpErrorHelper(w, http.StatusInternalServerError, result.Error.Error(), nil)
 		logger.LOG.Error(result.Error.Error())
 		return
 	}
@@ -73,7 +73,7 @@ func (h *ServiceHandler) GetMotorcyleById(w http.ResponseWriter, r *http.Request
 
 func (h *ServiceHandler) GetAllMotorcycles(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		helper.HttpErrorHelper(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
 		return
 	}
 
@@ -84,10 +84,10 @@ func (h *ServiceHandler) GetAllMotorcycles(w http.ResponseWriter, r *http.Reques
 	var motors []models.Motorcycles
 	var response []dto.MotorcycleResponseRequest
 
-	result := h.DB.Find(&motors)
+	result := h.DB.Preload("Orders").Preload("Ratings").Find(&motors)
 
 	if result.Error != nil {
-		http.Error(w, result.Error.Error(), http.StatusInternalServerError)
+		helper.HttpErrorHelper(w, http.StatusInternalServerError, result.Error.Error(), nil)
 		logger.LOG.Error(result.Error.Error())
 		return
 	}
@@ -124,7 +124,7 @@ func (h *ServiceHandler) GetAllMotorcycles(w http.ResponseWriter, r *http.Reques
 
 func (h *ServiceHandler) CreateNewMotorcycle(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		helper.HttpErrorHelper(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
 		return
 	}
 
@@ -133,13 +133,13 @@ func (h *ServiceHandler) CreateNewMotorcycle(w http.ResponseWriter, r *http.Requ
 	var req dto.MotorcyleCreationRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		helper.HttpErrorHelper(w, http.StatusBadRequest, err.Error(), nil)
 		logger.LOG.Error(err.Error())
 		return
 	}
 
 	if err := validator.Validate(&req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		helper.HttpErrorHelper(w, http.StatusBadRequest, err.Error(), nil)
 		logger.LOG.Error("Validation error: " + err.Error())
 		return
 	}
@@ -147,7 +147,7 @@ func (h *ServiceHandler) CreateNewMotorcycle(w http.ResponseWriter, r *http.Requ
 	adminID, ok := helper.GetUserID(r.Context())
 
 	if !ok {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		helper.HttpErrorHelper(w, http.StatusUnauthorized, "Unauthorized", nil)
 		return
 	}
 
@@ -173,7 +173,7 @@ func (h *ServiceHandler) CreateNewMotorcycle(w http.ResponseWriter, r *http.Requ
 
 	if txErr != nil {
 		logger.LOG.Error("Error inserting data, transaction rolled back:")
-		http.Error(w, txErr.Error(), http.StatusInternalServerError)
+		helper.HttpErrorHelper(w, http.StatusInternalServerError, txErr.Error(), nil)
 		return
 	} else {
 		logger.LOG.Info("Successfully created a new motorcycle with transaction!")

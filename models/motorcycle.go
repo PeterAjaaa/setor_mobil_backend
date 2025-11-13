@@ -18,7 +18,8 @@ type Motorcycles struct {
 	Description     string
 	ImageURL        string
 	CreatedByID     uint
-	Orders          *[]Orders `gorm:"foreignKey:MotorcycleID"`
+	Orders          *[]Orders  `gorm:"foreignKey:MotorcycleID"`
+	Ratings         *[]Ratings `gorm:"foreignKey:MotorcycleID"`
 }
 
 func (motor Motorcycles) TableName() string {
