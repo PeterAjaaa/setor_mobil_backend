@@ -21,7 +21,7 @@ type OrderResponseRequest struct {
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 	Duration       uint8
-	Rating         uint
+	Rating         *uint
 	PickupTime     time.Time
 	PickupLocation string
 	Price          uint32
