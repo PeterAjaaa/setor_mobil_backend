@@ -18,7 +18,8 @@ type Cars struct {
 	Description     string
 	ImageURL        string
 	CreatedByID     uint
-	Orders          *[]Orders `gorm:"foreignKey:CarID"`
+	Orders          *[]Orders  `gorm:"foreignKey:CarID"`
+	Ratings         *[]Ratings `gorm:"foreignKey:CarID"`
 }
 
 func (car Cars) TableName() string {
