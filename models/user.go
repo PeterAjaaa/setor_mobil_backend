@@ -21,8 +21,7 @@ type Users struct {
 	Kecamatan  string
 	Occupation string
 	Email      string
-	// TODO: Turn this back on when Orders has been implemented
-	// Orders     *[]Orders
+	Orders     *[]Orders `gorm:"foreignKey:UserID"`
 }
 
 func (user Users) TableName() string {
