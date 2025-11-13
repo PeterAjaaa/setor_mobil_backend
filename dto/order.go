@@ -13,6 +13,7 @@ type OrderCreationRequest struct {
 	Status         string    `json:"status" validate:"required,oneof=Active Pending Completed"`
 	CarID          *uint     `json:"car_id,omitempty"`
 	MotorcycleID   *uint     `json:"motorcycle_id,omitempty"`
+	// There isn't any UserID here, because UserID is automatically set up with context inside of the service
 }
 
 type OrderResponseRequest struct {
