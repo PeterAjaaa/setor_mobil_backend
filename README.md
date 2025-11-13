@@ -8,3 +8,14 @@
 - Refactor login function, it's close enough that I think it can be turned into a generic function, usable for both admin and user login
 - Protect certain routes with a new middleware, making it admin-only. Currently user JWT token can let them access admin endpoint. For now, this is fine, mitigated by the frontend being two different applications. But in the future, this is a bad security hole. Important to fix.
 - Use OpenAPI/Swagger to generate code from specification, for REST
+
+## Flow for new feature addition
+
+1. Define tables in `models/`
+2. Refactor other tables to resolve relationship, if needed
+3. Edit the migration to add the newly made table
+4. Implement `Model` interface, and other interfaces if applicable.
+5. Define the DTO needed for said feature
+6. Implement the services needed
+7. Set the route and the function called on said route
+8. Add seed data, and call it
