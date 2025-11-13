@@ -4,12 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/PeterAjaaa/setor_mobil_backend/dto"
 	"github.com/PeterAjaaa/setor_mobil_backend/helper"
 	"github.com/PeterAjaaa/setor_mobil_backend/logger"
 	"github.com/PeterAjaaa/setor_mobil_backend/models"
+	"github.com/PeterAjaaa/setor_mobil_backend/validator"
 	"gorm.io/gorm"
 )
 
@@ -26,6 +28,12 @@ func RegisterAdmin(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		logger.LOG.Error(err.Error())
+		return
+	}
+
+	if err := validator.Validate(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		logger.LOG.Error("Validation error: " + err.Error())
 		return
 	}
 
@@ -56,7 +64,7 @@ func RegisterAdmin(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, txErr.Error(), http.StatusInternalServerError)
 		return
 	} else {
-		logger.LOG.Info("Successfully registered new user with transaction!")
+		logger.LOG.Info("Successfully registered a new admin with transaction!")
 	}
 
 	response := dto.AdminResponseRequest{
@@ -65,7 +73,12 @@ func RegisterAdmin(w http.ResponseWriter, r *http.Request) {
 		Email:       admin.Email,
 		CarsCreated: admin.CarsCreated,
 	}
-	json.NewEncoder(w).Encode(response)
+
+	json.NewEncoder(w).Encode(models.APIResponse{
+		Status:  http.StatusCreated,
+		Message: "Successfully registered a new admin",
+		Data:    response,
+	})
 }
 
 func LoginAdmin(w http.ResponseWriter, r *http.Request) {
@@ -81,6 +94,12 @@ func LoginAdmin(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		logger.LOG.Error(err.Error())
+		return
+	}
+
+	if err := validator.Validate(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		logger.LOG.Error("Validation error: " + err.Error())
 		return
 	}
 
@@ -106,8 +125,13 @@ func LoginAdmin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(dto.LoginResponse{Token: token})
-	logger.LOG.Debug(fmt.Sprintf("User %s successfully has successfully logged in!", admin.Name))
+	json.NewEncoder(w).Encode(models.APIResponse{
+		Status:  http.StatusOK,
+		Message: fmt.Sprintf("Admin %s successfully has successfully logged in!", admin.Name),
+		Data:    dto.LoginResponse{Token: token},
+	})
+
+	logger.LOG.Debug(fmt.Sprintf("Admin %s successfully has successfully logged in!", admin.Name))
 }
 
 func (h *ServiceHandler) GetAdminById(w http.ResponseWriter, r *http.Request) {
@@ -123,7 +147,15 @@ func (h *ServiceHandler) GetAdminById(w http.ResponseWriter, r *http.Request) {
 
 	logger.LOG.Debug(fmt.Sprintf("Getting admin by ID:%d in GetAdminById() function...", admin.ID))
 
-	result := h.Auth.DB.Preload("CarsCreated").Preload("MotorcyclesCreated").First(&admin, r.PathValue("id"))
+	adminID, err := strconv.ParseUint(r.PathValue("id"), 10, 64)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		logger.LOG.Error(err.Error())
+		return
+	}
+
+	result := h.DB.Preload("CarsCreated").Preload("MotorcyclesCreated").First(&admin, adminID)
 
 	if result.Error != nil {
 		http.Error(w, result.Error.Error(), http.StatusInternalServerError)
@@ -132,8 +164,10 @@ func (h *ServiceHandler) GetAdminById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if result.RowsAffected == 0 {
-		json.NewEncoder(w).Encode(map[string]string{
-			"message": fmt.Sprintf("No admin with ID %s found", r.PathValue("id")),
+		json.NewEncoder(w).Encode(models.APIResponse{
+			Status:  http.StatusNotFound,
+			Message: fmt.Sprintf("No admin with ID %d found", adminID),
+			Data:    nil,
 		})
 		return
 	}
@@ -146,6 +180,11 @@ func (h *ServiceHandler) GetAdminById(w http.ResponseWriter, r *http.Request) {
 		MotorcyclesCreated: admin.MotorcyclesCreated,
 	}
 
-	json.NewEncoder(w).Encode(response)
+	json.NewEncoder(w).Encode(models.APIResponse{
+		Status:  http.StatusOK,
+		Message: fmt.Sprintf("Admin ID %d is found!", admin.ID),
+		Data:    response,
+	})
+
 	logger.LOG.Debug(fmt.Sprintf("Admin ID %d is found!", admin.ID))
 }

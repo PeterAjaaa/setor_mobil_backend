@@ -4,11 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/PeterAjaaa/setor_mobil_backend/dto"
 	"github.com/PeterAjaaa/setor_mobil_backend/helper"
 	"github.com/PeterAjaaa/setor_mobil_backend/logger"
 	"github.com/PeterAjaaa/setor_mobil_backend/models"
+	"github.com/PeterAjaaa/setor_mobil_backend/validator"
 	"gorm.io/gorm"
 )
 
@@ -25,7 +27,15 @@ func (h *ServiceHandler) GetMotorcyleById(w http.ResponseWriter, r *http.Request
 	var motor models.Motorcycles
 	var response dto.MotorcycleResponseRequest
 
-	result := h.Auth.DB.First(&motor, r.PathValue("id"))
+	motorID, err := strconv.ParseUint(r.PathValue("id"), 10, 64)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		logger.LOG.Error(err.Error())
+		return
+	}
+
+	result := h.DB.First(&motor, motorID)
 
 	if result.Error != nil {
 		http.Error(w, result.Error.Error(), http.StatusInternalServerError)
@@ -34,8 +44,10 @@ func (h *ServiceHandler) GetMotorcyleById(w http.ResponseWriter, r *http.Request
 	}
 
 	if result.RowsAffected == 0 {
-		json.NewEncoder(w).Encode(map[string]string{
-			"message": fmt.Sprintf("No motorcycle with ID %s found", r.PathValue("id")),
+		json.NewEncoder(w).Encode(models.APIResponse{
+			Status:  http.StatusNotFound,
+			Message: fmt.Sprintf("No motorcycle with ID %d found", motorID),
+			Data:    nil,
 		})
 		return
 	}
@@ -52,7 +64,11 @@ func (h *ServiceHandler) GetMotorcyleById(w http.ResponseWriter, r *http.Request
 		ImageURL:        motor.ImageURL,
 	}
 
-	json.NewEncoder(w).Encode(response)
+	json.NewEncoder(w).Encode(models.APIResponse{
+		Status:  http.StatusOK,
+		Message: fmt.Sprintf("Motorcycle ID %d is found!", motorID),
+		Data:    response,
+	})
 }
 
 func (h *ServiceHandler) GetAllMotorcycles(w http.ResponseWriter, r *http.Request) {
@@ -68,7 +84,7 @@ func (h *ServiceHandler) GetAllMotorcycles(w http.ResponseWriter, r *http.Reques
 	var motors []models.Motorcycles
 	var response []dto.MotorcycleResponseRequest
 
-	result := h.Auth.DB.Find(&motors)
+	result := h.DB.Find(&motors)
 
 	if result.Error != nil {
 		http.Error(w, result.Error.Error(), http.StatusInternalServerError)
@@ -77,8 +93,10 @@ func (h *ServiceHandler) GetAllMotorcycles(w http.ResponseWriter, r *http.Reques
 	}
 
 	if result.RowsAffected == 0 {
-		json.NewEncoder(w).Encode(map[string]string{
-			"message": "No motorcycles found",
+		json.NewEncoder(w).Encode(models.APIResponse{
+			Status:  http.StatusOK,
+			Message: "No motorcycles found",
+			Data:    nil,
 		})
 		return
 	}
@@ -97,7 +115,11 @@ func (h *ServiceHandler) GetAllMotorcycles(w http.ResponseWriter, r *http.Reques
 		})
 	}
 
-	json.NewEncoder(w).Encode(response)
+	json.NewEncoder(w).Encode(models.APIResponse{
+		Status:  http.StatusOK,
+		Message: fmt.Sprintf("Found %d motorcycles", len(response)),
+		Data:    response,
+	})
 }
 
 func (h *ServiceHandler) CreateNewMotorcycle(w http.ResponseWriter, r *http.Request) {
@@ -113,6 +135,12 @@ func (h *ServiceHandler) CreateNewMotorcycle(w http.ResponseWriter, r *http.Requ
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		logger.LOG.Error(err.Error())
+		return
+	}
+
+	if err := validator.Validate(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		logger.LOG.Error("Validation error: " + err.Error())
 		return
 	}
 
@@ -148,7 +176,7 @@ func (h *ServiceHandler) CreateNewMotorcycle(w http.ResponseWriter, r *http.Requ
 		http.Error(w, txErr.Error(), http.StatusInternalServerError)
 		return
 	} else {
-		logger.LOG.Info("Successfully created new motorcycle with transaction!")
+		logger.LOG.Info("Successfully created a new motorcycle with transaction!")
 	}
 
 	response := dto.MotorcycleResponseRequest{
@@ -162,6 +190,11 @@ func (h *ServiceHandler) CreateNewMotorcycle(w http.ResponseWriter, r *http.Requ
 		Description:     motor.Description,
 		ImageURL:        motor.ImageURL,
 	}
-	json.NewEncoder(w).Encode(response)
+	json.NewEncoder(w).Encode(
+		models.APIResponse{
+			Status:  http.StatusCreated,
+			Message: "Successfully created a new motorcycle!",
+			Data:    response,
+		})
 
 }

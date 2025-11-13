@@ -4,11 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/PeterAjaaa/setor_mobil_backend/dto"
 	"github.com/PeterAjaaa/setor_mobil_backend/helper"
 	"github.com/PeterAjaaa/setor_mobil_backend/logger"
 	"github.com/PeterAjaaa/setor_mobil_backend/models"
+	"github.com/PeterAjaaa/setor_mobil_backend/validator"
 	"gorm.io/gorm"
 )
 
@@ -25,7 +27,15 @@ func (h *ServiceHandler) GetCarById(w http.ResponseWriter, r *http.Request) {
 	var car models.Cars
 	var response dto.CarResponseRequest
 
-	result := h.Auth.DB.First(&car, r.PathValue("id"))
+	carID, err := strconv.ParseUint(r.PathValue("id"), 10, 64)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		logger.LOG.Error(err.Error())
+		return
+	}
+
+	result := h.DB.First(&car, carID)
 
 	if result.Error != nil {
 		http.Error(w, result.Error.Error(), http.StatusInternalServerError)
@@ -34,8 +44,10 @@ func (h *ServiceHandler) GetCarById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if result.RowsAffected == 0 {
-		json.NewEncoder(w).Encode(map[string]string{
-			"message": fmt.Sprintf("No car with ID %s found", r.PathValue("id")),
+		json.NewEncoder(w).Encode(models.APIResponse{
+			Status:  http.StatusNotFound,
+			Message: fmt.Sprintf("No car with ID %d found", carID),
+			Data:    "",
 		})
 		return
 	}
@@ -52,7 +64,11 @@ func (h *ServiceHandler) GetCarById(w http.ResponseWriter, r *http.Request) {
 		ImageURL:        car.ImageURL,
 	}
 
-	json.NewEncoder(w).Encode(response)
+	json.NewEncoder(w).Encode(models.APIResponse{
+		Status:  http.StatusOK,
+		Message: fmt.Sprintf("Car ID %d is found!", carID),
+		Data:    response,
+	})
 }
 
 func (h *ServiceHandler) GetAllCars(w http.ResponseWriter, r *http.Request) {
@@ -68,7 +84,7 @@ func (h *ServiceHandler) GetAllCars(w http.ResponseWriter, r *http.Request) {
 	var cars []models.Cars
 	var response []dto.CarResponseRequest
 
-	result := h.Auth.DB.Find(&cars)
+	result := h.DB.Find(&cars)
 
 	if result.Error != nil {
 		http.Error(w, result.Error.Error(), http.StatusInternalServerError)
@@ -77,8 +93,10 @@ func (h *ServiceHandler) GetAllCars(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if result.RowsAffected == 0 {
-		json.NewEncoder(w).Encode(map[string]string{
-			"message": "No cars found",
+		json.NewEncoder(w).Encode(models.APIResponse{
+			Status:  http.StatusNotFound,
+			Message: "No cars found",
+			Data:    nil,
 		})
 		return
 	}
@@ -97,7 +115,11 @@ func (h *ServiceHandler) GetAllCars(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	json.NewEncoder(w).Encode(response)
+	json.NewEncoder(w).Encode(models.APIResponse{
+		Status:  http.StatusOK,
+		Message: fmt.Sprintf("Found %d cars", len(response)),
+		Data:    response,
+	})
 }
 
 func (h *ServiceHandler) CreateNewCar(w http.ResponseWriter, r *http.Request) {
@@ -113,6 +135,12 @@ func (h *ServiceHandler) CreateNewCar(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		logger.LOG.Error(err.Error())
+		return
+	}
+
+	if err := validator.Validate(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		logger.LOG.Error("Validation error: " + err.Error())
 		return
 	}
 
@@ -148,7 +176,7 @@ func (h *ServiceHandler) CreateNewCar(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, txErr.Error(), http.StatusInternalServerError)
 		return
 	} else {
-		logger.LOG.Info("Successfully created new car with transaction!")
+		logger.LOG.Info("Successfully created a new car with transaction!")
 	}
 
 	response := dto.CarResponseRequest{
@@ -162,6 +190,11 @@ func (h *ServiceHandler) CreateNewCar(w http.ResponseWriter, r *http.Request) {
 		Description:     car.Description,
 		ImageURL:        car.ImageURL,
 	}
-	json.NewEncoder(w).Encode(response)
+
+	json.NewEncoder(w).Encode(models.APIResponse{
+		Status:  http.StatusCreated,
+		Message: "Successfully created a new car!",
+		Data:    response,
+	})
 
 }
