@@ -175,8 +175,8 @@ func (h *ServiceHandler) CreateNewOrder(w http.ResponseWriter, r *http.Request) 
 		PickupLocation: req.PickupLocation,
 		Price:          req.Price,
 		Status:         req.Status,
-		CarID:          helper.UintPtr(req.CarID),
-		MotorcycleID:   helper.UintPtr(req.MotorcycleID),
+		CarID:          req.CarID,
+		MotorcycleID:   req.MotorcycleID,
 		UserID:         userID,
 	}
 

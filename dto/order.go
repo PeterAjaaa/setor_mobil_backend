@@ -11,8 +11,8 @@ type OrderCreationRequest struct {
 	PickupLocation string    `json:"pickup_location" validate:"required"`
 	Price          uint32    `json:"price" validate:"required"`
 	Status         string    `json:"status" validate:"required,oneof=Active Pending Completed"`
-	CarID          uint      `json:"car_id" validate:"required"`
-	MotorcycleID   uint      `json:"motorcycle_id" validate:"required"`
+	CarID          *uint     `json:"car_id,omitempty"`
+	MotorcycleID   *uint     `json:"motorcycle_id,omitempty"`
 }
 
 type OrderResponseRequest struct {
@@ -31,11 +31,12 @@ type OrderResponseRequest struct {
 }
 
 func (o *OrderCreationRequest) Validate() error {
-	if o.CarID == 0 && o.MotorcycleID == 0 {
+	if o.CarID == nil && o.MotorcycleID == nil {
 		return errors.New("either car_id or motorcycle_id must be provided")
 	}
-	if o.CarID != 0 && o.MotorcycleID != 0 {
+	if o.CarID != nil && o.MotorcycleID != nil {
 		return errors.New("cannot provide both car_id and motorcycle_id")
 	}
+
 	return nil
 }
