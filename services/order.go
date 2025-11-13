@@ -16,7 +16,7 @@ import (
 
 func (h *ServiceHandler) GetOrderById(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		helper.HttpErrorHelper(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
 		return
 	}
 
@@ -30,25 +30,25 @@ func (h *ServiceHandler) GetOrderById(w http.ResponseWriter, r *http.Request) {
 	orderID, err := strconv.ParseUint(r.PathValue("id"), 10, 64)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		helper.HttpErrorHelper(w, http.StatusBadRequest, err.Error(), nil)
 		logger.LOG.Error(err.Error())
 		return
 	}
 
-	result := h.DB.First(&order, orderID)
+	result := h.DB.Preload("Rating").First(&order, orderID)
 
 	if result.Error != nil {
-		http.Error(w, result.Error.Error(), http.StatusInternalServerError)
+		helper.HttpErrorHelper(w, http.StatusInternalServerError, result.Error.Error(), nil)
 		logger.LOG.Error(result.Error.Error())
 		return
 	}
 
 	if result.RowsAffected == 0 {
-		http.Error(w, result.Error.Error(), http.StatusNotFound)
+		helper.HttpErrorHelper(w, http.StatusNotFound, result.Error.Error(), nil)
 		json.NewEncoder(w).Encode(
 			models.APIResponse{
 				Status:  http.StatusNotFound,
-				Message: fmt.Sprintf("No order with ID %s found", r.PathValue("id")),
+				Message: fmt.Sprintf("No order with ID %d found", orderID),
 				Data:    nil,
 			},
 		)
@@ -56,11 +56,9 @@ func (h *ServiceHandler) GetOrderById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response = dto.OrderResponseRequest{
-		ID:        order.ID,
-		CreatedAt: order.CreatedAt,
-		Duration:  order.Duration,
-		// TODO: TURN THIS ON WHEN RATING HAS BEEN IMPLEMENTED
-		// Rating:         order.Rating,
+		ID:             order.ID,
+		CreatedAt:      order.CreatedAt,
+		Duration:       order.Duration,
 		PickupTime:     order.PickupTime,
 		PickupLocation: order.PickupLocation,
 		Price:          order.Price,
@@ -79,7 +77,7 @@ func (h *ServiceHandler) GetOrderById(w http.ResponseWriter, r *http.Request) {
 
 func (h *ServiceHandler) GetAllOrdersByUserId(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		helper.HttpErrorHelper(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
 		return
 	}
 
@@ -93,21 +91,21 @@ func (h *ServiceHandler) GetAllOrdersByUserId(w http.ResponseWriter, r *http.Req
 	userID, err := strconv.ParseUint(r.PathValue("id"), 10, 64)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		helper.HttpErrorHelper(w, http.StatusBadRequest, err.Error(), nil)
 		logger.LOG.Error(err.Error())
 		return
 	}
 
-	result := h.DB.Where("user_id = ?", userID).Find(&orders)
+	result := h.DB.Where("user_id = ?", userID).Preload("Rating").Find(&orders)
 
 	if result.Error != nil {
-		http.Error(w, result.Error.Error(), http.StatusInternalServerError)
+		helper.HttpErrorHelper(w, http.StatusInternalServerError, result.Error.Error(), nil)
 		logger.LOG.Error(result.Error.Error())
 		return
 	}
 
 	if result.RowsAffected == 0 {
-		http.Error(w, result.Error.Error(), http.StatusNotFound)
+		helper.HttpErrorHelper(w, http.StatusNotFound, result.Error.Error(), nil)
 		json.NewEncoder(w).Encode(
 			models.APIResponse{
 				Status:  http.StatusNotFound,
@@ -120,11 +118,9 @@ func (h *ServiceHandler) GetAllOrdersByUserId(w http.ResponseWriter, r *http.Req
 
 	for _, order := range orders {
 		response = append(response, dto.OrderResponseRequest{
-			ID:        order.ID,
-			CreatedAt: order.CreatedAt,
-			Duration:  order.Duration,
-			// TODO: TURN THIS ON WHEN RATING HAS BEEN IMPLEMENTED
-			// Rating:         order.Rating,
+			ID:             order.ID,
+			CreatedAt:      order.CreatedAt,
+			Duration:       order.Duration,
 			PickupTime:     order.PickupTime,
 			PickupLocation: order.PickupLocation,
 			Price:          order.Price,
@@ -144,7 +140,7 @@ func (h *ServiceHandler) GetAllOrdersByUserId(w http.ResponseWriter, r *http.Req
 
 func (h *ServiceHandler) CreateNewOrder(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		helper.HttpErrorHelper(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
 		return
 	}
 
@@ -153,13 +149,13 @@ func (h *ServiceHandler) CreateNewOrder(w http.ResponseWriter, r *http.Request) 
 	var req dto.OrderCreationRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		helper.HttpErrorHelper(w, http.StatusBadRequest, err.Error(), nil)
 		logger.LOG.Error(err.Error())
 		return
 	}
 
 	if err := validator.Validate(&req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		helper.HttpErrorHelper(w, http.StatusBadRequest, err.Error(), nil)
 		logger.LOG.Error("Validation error: " + err.Error())
 		return
 	}
@@ -167,7 +163,7 @@ func (h *ServiceHandler) CreateNewOrder(w http.ResponseWriter, r *http.Request) 
 	userID, ok := helper.GetUserID(r.Context())
 
 	if !ok {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		helper.HttpErrorHelper(w, http.StatusUnauthorized, "Unauthorized", nil)
 		return
 	}
 
@@ -192,18 +188,16 @@ func (h *ServiceHandler) CreateNewOrder(w http.ResponseWriter, r *http.Request) 
 
 	if txErr != nil {
 		logger.LOG.Error("Error inserting data, transaction rolled back:")
-		http.Error(w, txErr.Error(), http.StatusInternalServerError)
+		helper.HttpErrorHelper(w, http.StatusInternalServerError, txErr.Error(), nil)
 		return
 	} else {
 		logger.LOG.Info("Successfully created a new order with transaction!")
 	}
 
 	response := dto.OrderResponseRequest{
-		ID:        order.ID,
-		CreatedAt: order.CreatedAt,
-		Duration:  order.Duration,
-		// TODO: TURN THIS ON WHEN RATING HAS BEEN IMPLEMENTED
-		// Rating:         order.Rating,
+		ID:             order.ID,
+		CreatedAt:      order.CreatedAt,
+		Duration:       order.Duration,
 		PickupTime:     order.PickupTime,
 		PickupLocation: order.PickupLocation,
 		Price:          order.Price,
@@ -215,7 +209,7 @@ func (h *ServiceHandler) CreateNewOrder(w http.ResponseWriter, r *http.Request) 
 
 	json.NewEncoder(w).Encode(models.APIResponse{
 		Status:  http.StatusOK,
-		Message: "Successfully created a new order with transaction",
+		Message: "Successfully created a new order",
 		Data:    response,
 	})
 
