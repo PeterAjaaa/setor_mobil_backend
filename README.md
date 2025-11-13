@@ -23,8 +23,8 @@
 
 1. Define tables in `models/`
 2. Refactor other tables to resolve relationship, if needed
-3. Edit the migration to add the newly made table
-4. Implement `Model` interface, and other interfaces if applicable.
+3. Implement `Model` interface, and other interfaces if applicable.
+4. Edit the migration to add the newly made table
 5. Define the DTO needed for said feature
 6. Implement the services needed
 7. Set the route and the function called on said route
