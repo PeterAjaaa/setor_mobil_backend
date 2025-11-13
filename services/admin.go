@@ -17,7 +17,7 @@ import (
 
 func RegisterAdmin(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		helper.HttpErrorHelper(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
 		return
 	}
 
@@ -26,20 +26,19 @@ func RegisterAdmin(w http.ResponseWriter, r *http.Request) {
 	var req dto.AdminCreationRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		logger.LOG.Error(err.Error())
+		helper.HttpErrorHelper(w, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 
 	if err := validator.Validate(&req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		helper.HttpErrorHelper(w, http.StatusBadRequest, err.Error(), nil)
 		logger.LOG.Error("Validation error: " + err.Error())
 		return
 	}
 
 	hashedPassword, err := helper.HashPassword(req.Password)
 	if err != nil {
-		http.Error(w, "Failed to hash password", http.StatusInternalServerError)
+		helper.HttpErrorHelper(w, http.StatusInternalServerError, "Failed to hash passwowrd", nil)
 		logger.LOG.Error(err.Error())
 		return
 	}
@@ -61,7 +60,7 @@ func RegisterAdmin(w http.ResponseWriter, r *http.Request) {
 
 	if txErr != nil {
 		logger.LOG.Error("Error inserting data, transaction rolled back:")
-		http.Error(w, txErr.Error(), http.StatusInternalServerError)
+		helper.HttpErrorHelper(w, http.StatusInternalServerError, txErr.Error(), nil)
 		return
 	} else {
 		logger.LOG.Info("Successfully registered a new admin with transaction!")
@@ -83,7 +82,7 @@ func RegisterAdmin(w http.ResponseWriter, r *http.Request) {
 
 func LoginAdmin(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		helper.HttpErrorHelper(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
 		return
 	}
 
@@ -92,13 +91,13 @@ func LoginAdmin(w http.ResponseWriter, r *http.Request) {
 	var req dto.LoginRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		helper.HttpErrorHelper(w, http.StatusBadRequest, err.Error(), nil)
 		logger.LOG.Error(err.Error())
 		return
 	}
 
 	if err := validator.Validate(&req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		helper.HttpErrorHelper(w, http.StatusBadRequest, err.Error(), nil)
 		logger.LOG.Error("Validation error: " + err.Error())
 		return
 	}
@@ -108,19 +107,19 @@ func LoginAdmin(w http.ResponseWriter, r *http.Request) {
 	db := helper.GetDB()
 
 	if err := db.Where("email = ?", req.Email).First(&admin).Error; err != nil {
-		http.Error(w, "Invalid email or password", http.StatusUnauthorized)
+		helper.HttpErrorHelper(w, http.StatusUnauthorized, "Invalid email or password", nil)
 		logger.LOG.Error(err.Error())
 		return
 	}
 
 	if !helper.CheckPasswordHash(req.Password, admin.Password) {
-		http.Error(w, "Invalid email or password", http.StatusUnauthorized)
+		helper.HttpErrorHelper(w, http.StatusUnauthorized, "Invalid email or password", nil)
 		return
 	}
 
 	token, err := helper.GenerateJWT(admin)
 	if err != nil {
-		http.Error(w, "Failed to create token", http.StatusInternalServerError)
+		helper.HttpErrorHelper(w, http.StatusInternalServerError, "Failed to create token", nil)
 		logger.LOG.Error(err.Error())
 		return
 	}
@@ -136,7 +135,7 @@ func LoginAdmin(w http.ResponseWriter, r *http.Request) {
 
 func (h *ServiceHandler) GetAdminById(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		helper.HttpErrorHelper(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
 		return
 	}
 
@@ -150,7 +149,7 @@ func (h *ServiceHandler) GetAdminById(w http.ResponseWriter, r *http.Request) {
 	adminID, err := strconv.ParseUint(r.PathValue("id"), 10, 64)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		helper.HttpErrorHelper(w, http.StatusBadRequest, err.Error(), nil)
 		logger.LOG.Error(err.Error())
 		return
 	}
@@ -158,7 +157,7 @@ func (h *ServiceHandler) GetAdminById(w http.ResponseWriter, r *http.Request) {
 	result := h.DB.Preload("CarsCreated").Preload("MotorcyclesCreated").First(&admin, adminID)
 
 	if result.Error != nil {
-		http.Error(w, result.Error.Error(), http.StatusInternalServerError)
+		helper.HttpErrorHelper(w, http.StatusInternalServerError, result.Error.Error(), nil)
 		logger.LOG.Error(result.Error.Error())
 		return
 	}
