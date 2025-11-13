@@ -17,4 +17,5 @@ func SeedDatabase() {
 	helper.SeedTable(db, carSeed)
 	helper.SeedTable(db, motorcycleSeed)
 	helper.SeedTable(db, orderSeed)
+	helper.SeedTable(db, ratingSeed)
 }

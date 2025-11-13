@@ -44,4 +44,10 @@ func Router() {
 	NewMux.Handle("/orders/{id}", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.GetOrderById)))
 	NewMux.Handle("/orders/user/{id}", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.GetAllOrdersByUserId)))
 
+	NewMux.Handle("/ratings/create", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.CreateNewRating)))
+	NewMux.Handle("/ratings/{id}", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.GetRatingById)))
+	NewMux.Handle("/ratings/order/{id}", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.GetAllRatingByOrderID)))
+	NewMux.Handle("/ratings/user/{id}", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.GetAllRatingByUserID)))
+	NewMux.Handle("/ratings/car/{id}", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.GetAllRatingByCarID)))
+	NewMux.Handle("/ratings/motorcycle/{id}", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.GetAllRatingByMotorcycleID)))
 }

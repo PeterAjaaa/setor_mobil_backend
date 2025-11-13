@@ -11,4 +11,5 @@ func DoMigrateTables() {
 	helper.MigrateTable(&models.Admins{})
 	helper.MigrateTable(&models.Motorcycles{})
 	helper.MigrateTable(&models.Orders{})
+	helper.MigrateTable(&models.Ratings{})
 }
