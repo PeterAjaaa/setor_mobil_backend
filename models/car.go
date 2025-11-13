@@ -17,8 +17,8 @@ type Cars struct {
 	Status          string
 	Description     string
 	ImageURL        string
-	// FK Field
-	CreatedByID uint
+	CreatedByID     uint
+	Orders          *[]Orders `gorm:"foreignKey:CarID"`
 }
 
 func (car Cars) TableName() string {
