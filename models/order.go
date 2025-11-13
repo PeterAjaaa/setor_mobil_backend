@@ -10,11 +10,11 @@ type Orders struct {
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 	Duration       uint8
-	Rating         uint
 	PickupTime     time.Time
 	PickupLocation string
 	Price          uint32
 	Status         string
+	Rating         *uint
 	CarID          *uint `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	MotorcycleID   *uint `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	UserID         uint

@@ -9,8 +9,9 @@ import (
 
 var orderSeed = []models.Orders{
 	{
-		Duration:       5,
-		Rating:         5,
+		Duration: 5,
+		// TODO: Turn this back on when rating has been implemented
+		// Rating:         5,
 		PickupTime:     time.Now(),
 		PickupLocation: "Bandung",
 		Price:          300000,
@@ -19,8 +20,9 @@ var orderSeed = []models.Orders{
 		UserID:         1,
 	},
 	{
-		Duration:       10,
-		Rating:         4,
+		Duration: 10,
+		// TODO: Turn this back on when rating has been implemented
+		// Rating:         4,
 		PickupTime:     time.Now(),
 		PickupLocation: "Jakarta",
 		Price:          150000,

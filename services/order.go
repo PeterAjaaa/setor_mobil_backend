@@ -56,10 +56,11 @@ func (h *ServiceHandler) GetOrderById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response = dto.OrderResponseRequest{
-		ID:             order.ID,
-		CreatedAt:      order.CreatedAt,
-		Duration:       order.Duration,
-		Rating:         order.Rating,
+		ID:        order.ID,
+		CreatedAt: order.CreatedAt,
+		Duration:  order.Duration,
+		// TODO: TURN THIS ON WHEN RATING HAS BEEN IMPLEMENTED
+		// Rating:         order.Rating,
 		PickupTime:     order.PickupTime,
 		PickupLocation: order.PickupLocation,
 		Price:          order.Price,
@@ -119,10 +120,11 @@ func (h *ServiceHandler) GetAllOrdersByUserId(w http.ResponseWriter, r *http.Req
 
 	for _, order := range orders {
 		response = append(response, dto.OrderResponseRequest{
-			ID:             order.ID,
-			CreatedAt:      order.CreatedAt,
-			Duration:       order.Duration,
-			Rating:         order.Rating,
+			ID:        order.ID,
+			CreatedAt: order.CreatedAt,
+			Duration:  order.Duration,
+			// TODO: TURN THIS ON WHEN RATING HAS BEEN IMPLEMENTED
+			// Rating:         order.Rating,
 			PickupTime:     order.PickupTime,
 			PickupLocation: order.PickupLocation,
 			Price:          order.Price,
@@ -197,10 +199,11 @@ func (h *ServiceHandler) CreateNewOrder(w http.ResponseWriter, r *http.Request) 
 	}
 
 	response := dto.OrderResponseRequest{
-		ID:             order.ID,
-		CreatedAt:      order.CreatedAt,
-		Duration:       order.Duration,
-		Rating:         order.Rating,
+		ID:        order.ID,
+		CreatedAt: order.CreatedAt,
+		Duration:  order.Duration,
+		// TODO: TURN THIS ON WHEN RATING HAS BEEN IMPLEMENTED
+		// Rating:         order.Rating,
 		PickupTime:     order.PickupTime,
 		PickupLocation: order.PickupLocation,
 		Price:          order.Price,
