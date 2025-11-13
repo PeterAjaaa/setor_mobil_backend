@@ -21,7 +21,8 @@ type Users struct {
 	Kecamatan  string
 	Occupation string
 	Email      string
-	Orders     *[]Orders `gorm:"foreignKey:UserID"`
+	Orders     *[]Orders  `gorm:"foreignKey:UserID"`
+	Ratings    *[]Ratings `gorm:"foreignKey:UserID"`
 }
 
 func (user Users) TableName() string {
