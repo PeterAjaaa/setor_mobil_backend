@@ -7,12 +7,10 @@ import (
 	"github.com/PeterAjaaa/setor_mobil_backend/helper"
 	"github.com/PeterAjaaa/setor_mobil_backend/logger"
 	"github.com/golang-jwt/jwt/v5"
-	"gorm.io/gorm"
 )
 
 type AuthHandler struct {
 	JwtKey []byte
-	DB     *gorm.DB
 }
 
 func (h *AuthHandler) AuthMiddleware(next http.Handler) http.Handler {
