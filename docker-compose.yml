@@ -2,7 +2,7 @@ services:
   api:
     build: .
     ports:
-      - "${HOST_PORT}:${CONTAINER_PORT}"
+      - "${HOST_IP}:${HOST_PORT}:${CONTAINER_PORT}"
     environment:
       - JWT_KEY=${JWT_KEY}
       - LOGLEVEL=${LOGLEVEL}
