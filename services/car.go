@@ -62,6 +62,8 @@ func (h *ServiceHandler) GetCarById(w http.ResponseWriter, r *http.Request) {
 		Status:          car.Status,
 		Description:     car.Description,
 		ImageURL:        car.ImageURL,
+		Orders:          car.Orders,
+		Ratings:         car.Ratings,
 	}
 
 	json.NewEncoder(w).Encode(models.APIResponse{
@@ -112,6 +114,8 @@ func (h *ServiceHandler) GetAllCars(w http.ResponseWriter, r *http.Request) {
 			Status:          car.Status,
 			Description:     car.Description,
 			ImageURL:        car.ImageURL,
+			Orders:          car.Orders,
+			Ratings:         car.Ratings,
 		})
 	}
 
