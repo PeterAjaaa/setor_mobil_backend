@@ -13,12 +13,12 @@ type RatingCreationRequest struct {
 }
 
 type RatingResponseRequest struct {
-	ID           uint
-	Rating       uint8
-	UserID       uint
-	OrderID      uint
-	CarID        uint
-	MotorcycleID uint
+	ID           uint  `json:"id"`
+	Rating       uint8 `json:"rating"`
+	UserID       uint  `json:"user_id"`
+	OrderID      uint  `json:"order_id"`
+	CarID        uint  `json:"car_id"`
+	MotorcycleID uint  `json:"motorcycle_id"`
 }
 
 func (o *RatingCreationRequest) Validate() error {
