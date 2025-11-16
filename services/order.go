@@ -66,6 +66,7 @@ func (h *ServiceHandler) GetOrderById(w http.ResponseWriter, r *http.Request) {
 		CarID:          helper.UintValue(order.CarID),
 		MotorcycleID:   helper.UintValue(order.MotorcycleID),
 		UserID:         order.UserID,
+		Rating:         order.Rating,
 	}
 
 	json.NewEncoder(w).Encode(models.APIResponse{
@@ -128,6 +129,7 @@ func (h *ServiceHandler) GetAllOrdersByUserId(w http.ResponseWriter, r *http.Req
 			CarID:          helper.UintValue(order.CarID),
 			MotorcycleID:   helper.UintValue(order.MotorcycleID),
 			UserID:         order.UserID,
+			Rating:         order.Rating,
 		})
 	}
 
