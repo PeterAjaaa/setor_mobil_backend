@@ -3,6 +3,8 @@ package dto
 import (
 	"errors"
 	"time"
+
+	"github.com/PeterAjaaa/setor_mobil_backend/models"
 )
 
 type OrderCreationRequest struct {
@@ -17,18 +19,18 @@ type OrderCreationRequest struct {
 }
 
 type OrderResponseRequest struct {
-	ID             uint
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	Duration       uint8
-	Rating         *uint
-	PickupTime     time.Time
-	PickupLocation string
-	Price          uint32
-	Status         string
-	CarID          uint
-	MotorcycleID   uint
-	UserID         uint
+	ID             uint            `json:"id"`
+	CreatedAt      time.Time       `json:"created_at"`
+	UpdatedAt      time.Time       `json:"updated_at"`
+	Duration       uint8           `json:"duration"`
+	Rating         *models.Ratings `json:"rating"`
+	PickupTime     time.Time       `json:"pickup_time"`
+	PickupLocation string          `json:"pickup_location"`
+	Price          uint32          `json:"price"`
+	Status         string          `json:"status"`
+	CarID          uint            `json:"car_id"`
+	MotorcycleID   uint            `json:"motorcycle_id"`
+	UserID         uint            `json:"user_id"`
 }
 
 func (o *OrderCreationRequest) Validate() error {
