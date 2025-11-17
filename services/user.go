@@ -44,11 +44,7 @@ func (h *ServiceHandler) GetUserById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if result.RowsAffected == 0 {
-		json.NewEncoder(w).Encode(models.APIResponse{
-			Status:  http.StatusNotFound,
-			Message: fmt.Sprintf("No user with ID %d found", userID),
-			Data:    nil,
-		})
+		helper.HttpErrorHelper(w, http.StatusNotFound, fmt.Sprintf("No user with ID %d found", userID), nil)
 		return
 	}
 

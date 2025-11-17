@@ -44,14 +44,7 @@ func (h *ServiceHandler) GetOrderById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if result.RowsAffected == 0 {
-		helper.HttpErrorHelper(w, http.StatusNotFound, result.Error.Error(), nil)
-		json.NewEncoder(w).Encode(
-			models.APIResponse{
-				Status:  http.StatusNotFound,
-				Message: fmt.Sprintf("No order with ID %d found", orderID),
-				Data:    nil,
-			},
-		)
+		helper.HttpErrorHelper(w, http.StatusNotFound, fmt.Sprintf("No order with ID %d found", orderID), nil)
 		return
 	}
 
@@ -106,14 +99,7 @@ func (h *ServiceHandler) GetAllOrdersByUserId(w http.ResponseWriter, r *http.Req
 	}
 
 	if result.RowsAffected == 0 {
-		helper.HttpErrorHelper(w, http.StatusNotFound, result.Error.Error(), nil)
-		json.NewEncoder(w).Encode(
-			models.APIResponse{
-				Status:  http.StatusNotFound,
-				Message: fmt.Sprintf("No order for user ID %d found", userID),
-				Data:    nil,
-			},
-		)
+		helper.HttpErrorHelper(w, http.StatusNotFound, fmt.Sprintf("No order for user ID %d found", userID), nil)
 		return
 	}
 

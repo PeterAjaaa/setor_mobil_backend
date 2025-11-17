@@ -163,11 +163,7 @@ func (h *ServiceHandler) GetAdminById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if result.RowsAffected == 0 {
-		json.NewEncoder(w).Encode(models.APIResponse{
-			Status:  http.StatusNotFound,
-			Message: fmt.Sprintf("No admin with ID %d found", adminID),
-			Data:    nil,
-		})
+		helper.HttpErrorHelper(w, http.StatusNotFound, fmt.Sprintf("No admin with ID %d found", adminID), nil)
 		return
 	}
 

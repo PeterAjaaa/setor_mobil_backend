@@ -44,11 +44,7 @@ func (h *ServiceHandler) GetCarById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if result.RowsAffected == 0 {
-		json.NewEncoder(w).Encode(models.APIResponse{
-			Status:  http.StatusNotFound,
-			Message: fmt.Sprintf("No car with ID %d found", carID),
-			Data:    "",
-		})
+		helper.HttpErrorHelper(w, http.StatusNotFound, fmt.Sprintf("No car with ID %d found", carID), nil)
 		return
 	}
 
@@ -95,11 +91,7 @@ func (h *ServiceHandler) GetAllCars(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if result.RowsAffected == 0 {
-		json.NewEncoder(w).Encode(models.APIResponse{
-			Status:  http.StatusNotFound,
-			Message: "No cars found",
-			Data:    nil,
-		})
+		helper.HttpErrorHelper(w, http.StatusNotFound, "No cars found", nil)
 		return
 	}
 

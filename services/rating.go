@@ -44,14 +44,7 @@ func (h *ServiceHandler) GetRatingById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if result.RowsAffected == 0 {
-		helper.HttpErrorHelper(w, http.StatusNotFound, result.Error.Error(), nil)
-		json.NewEncoder(w).Encode(
-			models.APIResponse{
-				Status:  http.StatusNotFound,
-				Message: fmt.Sprintf("No rating with ID %d found", ratingID),
-				Data:    nil,
-			},
-		)
+		helper.HttpErrorHelper(w, http.StatusNotFound, fmt.Sprintf("No rating with ID %d found", ratingID), nil)
 		return
 	}
 
@@ -101,14 +94,7 @@ func (h *ServiceHandler) GetAllRatingByOrderID(w http.ResponseWriter, r *http.Re
 	}
 
 	if result.RowsAffected == 0 {
-		helper.HttpErrorHelper(w, http.StatusNotFound, result.Error.Error(), nil)
-		json.NewEncoder(w).Encode(
-			models.APIResponse{
-				Status:  http.StatusNotFound,
-				Message: fmt.Sprintf("No ratings for order ID %d found", orderID),
-				Data:    nil,
-			},
-		)
+		helper.HttpErrorHelper(w, http.StatusNotFound, fmt.Sprintf("No ratings for order ID %d found", orderID), nil)
 		return
 	}
 
@@ -160,14 +146,7 @@ func (h *ServiceHandler) GetAllRatingByUserID(w http.ResponseWriter, r *http.Req
 	}
 
 	if result.RowsAffected == 0 {
-		helper.HttpErrorHelper(w, http.StatusNotFound, result.Error.Error(), nil)
-		json.NewEncoder(w).Encode(
-			models.APIResponse{
-				Status:  http.StatusNotFound,
-				Message: fmt.Sprintf("No ratings by user ID %d found", userID),
-				Data:    nil,
-			},
-		)
+		helper.HttpErrorHelper(w, http.StatusNotFound, fmt.Sprintf("No ratings by user ID %d found", userID), nil)
 		return
 	}
 
@@ -219,14 +198,7 @@ func (h *ServiceHandler) GetAllRatingByCarID(w http.ResponseWriter, r *http.Requ
 	}
 
 	if result.RowsAffected == 0 {
-		helper.HttpErrorHelper(w, http.StatusNotFound, result.Error.Error(), nil)
-		json.NewEncoder(w).Encode(
-			models.APIResponse{
-				Status:  http.StatusNotFound,
-				Message: fmt.Sprintf("No ratings for car ID %d found", carID),
-				Data:    nil,
-			},
-		)
+		helper.HttpErrorHelper(w, http.StatusNotFound, fmt.Sprintf("No ratings for car ID %d found", carID), nil)
 		return
 	}
 
@@ -278,14 +250,7 @@ func (h *ServiceHandler) GetAllRatingByMotorcycleID(w http.ResponseWriter, r *ht
 	}
 
 	if result.RowsAffected == 0 {
-		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(
-			models.APIResponse{
-				Status:  http.StatusNotFound,
-				Message: fmt.Sprintf("No ratings for motorcycle ID %d found", motorID),
-				Data:    nil,
-			},
-		)
+		helper.HttpErrorHelper(w, http.StatusNotFound, fmt.Sprintf("No ratings for motorcycle ID %d found", motorID), nil)
 		return
 	}
 
