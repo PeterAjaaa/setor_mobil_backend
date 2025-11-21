@@ -29,6 +29,7 @@
 - Add realtime data update to clients, maybe with WebSocket or similar
 - Add healthcheck endpoint for API
 - Add metrics endpoint for observability
+- Set service fee and insurance from backend
 
 ## Flow for new feature addition
 
