@@ -11,6 +11,8 @@ type Orders struct {
 	UpdatedAt    time.Time
 	Duration     uint8
 	PickupTime   time.Time
+	StartDate    time.Time
+	ReturnDate   time.Time
 	Price        uint32
 	Status       string
 	CarID        *uint

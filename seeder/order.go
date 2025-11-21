@@ -11,6 +11,8 @@ var orderSeed = []models.Orders{
 	{
 		Duration:   5,
 		PickupTime: time.Now(),
+		StartDate:  time.Now(),
+		ReturnDate: time.Now(),
 		Price:      300000,
 		Status:     "Active",
 		CarID:      helper.UintPtr(1),
@@ -19,6 +21,8 @@ var orderSeed = []models.Orders{
 	{
 		Duration:     10,
 		PickupTime:   time.Now(),
+		StartDate:    time.Now(),
+		ReturnDate:   time.Now(),
 		Price:        150000,
 		Status:       "Completed",
 		MotorcycleID: helper.UintPtr(2),
