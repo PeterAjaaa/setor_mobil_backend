@@ -18,6 +18,17 @@
 - Refactor login function, it's close enough that I think it can be turned into a generic function, usable for both admin and user login
 - Protect certain routes with a new middleware, making it admin-only. Currently user JWT token can let them access admin endpoint. For now, this is fine, mitigated by the frontend being two different applications. But in the future, this is a bad security hole. Important to fix.
 - Use OpenAPI/Swagger to generate code from specification, for REST API
+- Change seeding logic to only once if exist.
+- Change how DTOs are used now. Maybe something that automatically fills the field by some kind of rule or something (e.g. Cars returning nil when everything works properly. Turns out it's DTO lagging behind and isn't setup to fill properly)
+- Change 'Rating' field in Car and Motorcycle model to a uint8, where this 'Rating' is calculated automatically using background worker, the trigger being new entry being added in the Rating table. The 'Rating' field value in Car and Motorcycle would be calculated by getting the average value for each of the Car or Motorcycle.
+- Zero-downtime deployment with blue-green strategy (maybe with Docker Rollout, or something.)
+- Cloudflare Turnstile protecting routes like register and login
+- Add timeout to login attempt to prevent brute-force
+- Implement unit testing for each of the functions
+- Refactor services functions, since it looks like some of them share the same characteristics for handling certain operations, no matter the context
+- Add realtime data update to clients, maybe with WebSocket or similar
+- Add healthcheck endpoint for API
+- Add metrics endpoint for observability
 
 ## Flow for new feature addition
 
