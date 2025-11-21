@@ -49,17 +49,16 @@ func (h *ServiceHandler) GetOrderById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response = dto.OrderResponseRequest{
-		ID:             order.ID,
-		CreatedAt:      order.CreatedAt,
-		Duration:       order.Duration,
-		PickupTime:     order.PickupTime,
-		PickupLocation: order.PickupLocation,
-		Price:          order.Price,
-		Status:         order.Status,
-		CarID:          helper.UintValue(order.CarID),
-		MotorcycleID:   helper.UintValue(order.MotorcycleID),
-		UserID:         order.UserID,
-		Rating:         order.Rating,
+		ID:           order.ID,
+		CreatedAt:    order.CreatedAt,
+		Duration:     order.Duration,
+		PickupTime:   order.PickupTime,
+		Price:        order.Price,
+		Status:       order.Status,
+		CarID:        helper.UintValue(order.CarID),
+		MotorcycleID: helper.UintValue(order.MotorcycleID),
+		UserID:       order.UserID,
+		Rating:       order.Rating,
 	}
 
 	json.NewEncoder(w).Encode(models.APIResponse{
@@ -105,17 +104,16 @@ func (h *ServiceHandler) GetAllOrdersByUserId(w http.ResponseWriter, r *http.Req
 
 	for _, order := range orders {
 		response = append(response, dto.OrderResponseRequest{
-			ID:             order.ID,
-			CreatedAt:      order.CreatedAt,
-			Duration:       order.Duration,
-			PickupTime:     order.PickupTime,
-			PickupLocation: order.PickupLocation,
-			Price:          order.Price,
-			Status:         order.Status,
-			CarID:          helper.UintValue(order.CarID),
-			MotorcycleID:   helper.UintValue(order.MotorcycleID),
-			UserID:         order.UserID,
-			Rating:         order.Rating,
+			ID:           order.ID,
+			CreatedAt:    order.CreatedAt,
+			Duration:     order.Duration,
+			PickupTime:   order.PickupTime,
+			Price:        order.Price,
+			Status:       order.Status,
+			CarID:        helper.UintValue(order.CarID),
+			MotorcycleID: helper.UintValue(order.MotorcycleID),
+			UserID:       order.UserID,
+			Rating:       order.Rating,
 		})
 	}
 
@@ -156,14 +154,13 @@ func (h *ServiceHandler) CreateNewOrder(w http.ResponseWriter, r *http.Request) 
 	}
 
 	order := models.Orders{
-		Duration:       req.Duration,
-		PickupTime:     req.PickupTime,
-		PickupLocation: req.PickupLocation,
-		Price:          req.Price,
-		Status:         req.Status,
-		CarID:          req.CarID,
-		MotorcycleID:   req.MotorcycleID,
-		UserID:         userID,
+		Duration:     req.Duration,
+		PickupTime:   req.PickupTime,
+		Price:        req.Price,
+		Status:       req.Status,
+		CarID:        req.CarID,
+		MotorcycleID: req.MotorcycleID,
+		UserID:       userID,
 	}
 
 	db := helper.GetDB()
@@ -183,16 +180,15 @@ func (h *ServiceHandler) CreateNewOrder(w http.ResponseWriter, r *http.Request) 
 	}
 
 	response := dto.OrderResponseRequest{
-		ID:             order.ID,
-		CreatedAt:      order.CreatedAt,
-		Duration:       order.Duration,
-		PickupTime:     order.PickupTime,
-		PickupLocation: order.PickupLocation,
-		Price:          order.Price,
-		Status:         order.Status,
-		CarID:          helper.UintValue(order.CarID),
-		MotorcycleID:   helper.UintValue(order.MotorcycleID),
-		UserID:         order.UserID,
+		ID:           order.ID,
+		CreatedAt:    order.CreatedAt,
+		Duration:     order.Duration,
+		PickupTime:   order.PickupTime,
+		Price:        order.Price,
+		Status:       order.Status,
+		CarID:        helper.UintValue(order.CarID),
+		MotorcycleID: helper.UintValue(order.MotorcycleID),
+		UserID:       order.UserID,
 	}
 
 	json.NewEncoder(w).Encode(models.APIResponse{

@@ -6,18 +6,17 @@ import (
 )
 
 type Orders struct {
-	ID             uint `gorm:"primaryKey"`
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	Duration       uint8
-	PickupTime     time.Time
-	PickupLocation string
-	Price          uint32
-	Status         string
-	CarID          *uint
-	MotorcycleID   *uint
-	UserID         uint
-	Rating         *Ratings `gorm:"foreignKey:OrderID"`
+	ID           uint `gorm:"primaryKey"`
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	Duration     uint8
+	PickupTime   time.Time
+	Price        uint32
+	Status       string
+	CarID        *uint
+	MotorcycleID *uint
+	UserID       uint
+	Rating       *Ratings `gorm:"foreignKey:OrderID"`
 }
 
 func (order Orders) TableName() string {

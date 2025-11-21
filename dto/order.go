@@ -8,13 +8,12 @@ import (
 )
 
 type OrderCreationRequest struct {
-	Duration       uint8     `json:"duration" validate:"required,min=1"`
-	PickupTime     time.Time `json:"pickup_time" validate:"required"`
-	PickupLocation string    `json:"pickup_location" validate:"required"`
-	Price          uint32    `json:"price" validate:"required"`
-	Status         string    `json:"status" validate:"required,oneof=Active Pending Completed"`
-	CarID          *uint     `json:"car_id,omitempty"`
-	MotorcycleID   *uint     `json:"motorcycle_id,omitempty"`
+	Duration     uint8     `json:"duration" validate:"required,min=1"`
+	PickupTime   time.Time `json:"pickup_time" validate:"required"`
+	Price        uint32    `json:"price" validate:"required"`
+	Status       string    `json:"status" validate:"required,oneof=Active Pending Completed"`
+	CarID        *uint     `json:"car_id,omitempty"`
+	MotorcycleID *uint     `json:"motorcycle_id,omitempty"`
 	// There isn't any UserID here, because UserID is automatically set up with context inside of the service
 }
 
