@@ -1,6 +1,7 @@
 package dto
 
 import (
+	"encoding/json"
 	"errors"
 	"time"
 
@@ -44,4 +45,20 @@ func (o *OrderCreationRequest) Validate() error {
 	}
 
 	return nil
+}
+
+func (o OrderResponseRequest) MarshalJSON() ([]byte, error) {
+	type Alias OrderResponseRequest
+
+	return json.Marshal(&struct {
+		PickupTime string `json:"pickup_time"`
+		StartDate  string `json:"start_date"`
+		ReturnDate string `json:"return_date"`
+		*Alias
+	}{
+		PickupTime: o.PickupTime.Format(time.RFC3339),
+		StartDate:  o.StartDate.Format(time.RFC3339),
+		ReturnDate: o.ReturnDate.Format(time.RFC3339),
+		Alias:      (*Alias)(&o),
+	})
 }
