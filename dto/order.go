@@ -30,8 +30,8 @@ type OrderResponseRequest struct {
 	ReturnDate   time.Time       `json:"return_date"`
 	Price        uint32          `json:"price"`
 	Status       string          `json:"status"`
-	CarID        uint            `json:"car_id"`
-	MotorcycleID uint            `json:"motorcycle_id"`
+	CarID        *uint           `json:"car_id"`
+	MotorcycleID *uint           `json:"motorcycle_id"`
 	UserID       uint            `json:"user_id"`
 }
 

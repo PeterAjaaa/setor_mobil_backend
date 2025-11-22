@@ -53,8 +53,8 @@ func (h *ServiceHandler) GetRatingById(w http.ResponseWriter, r *http.Request) {
 		Rating:       rating.Rating,
 		UserID:       rating.UserID,
 		OrderID:      rating.OrderID,
-		CarID:        helper.UintValue(rating.CarID),
-		MotorcycleID: helper.UintValue(rating.MotorcycleID),
+		CarID:        rating.CarID,
+		MotorcycleID: rating.MotorcycleID,
 	}
 
 	json.NewEncoder(w).Encode(models.APIResponse{
@@ -104,8 +104,8 @@ func (h *ServiceHandler) GetAllRatingByOrderID(w http.ResponseWriter, r *http.Re
 			Rating:       rating.Rating,
 			UserID:       rating.UserID,
 			OrderID:      rating.OrderID,
-			CarID:        helper.UintValue(rating.CarID),
-			MotorcycleID: helper.UintValue(rating.MotorcycleID),
+			CarID:        rating.CarID,
+			MotorcycleID: rating.MotorcycleID,
 		})
 	}
 
@@ -156,8 +156,8 @@ func (h *ServiceHandler) GetAllRatingByUserID(w http.ResponseWriter, r *http.Req
 			Rating:       rating.Rating,
 			UserID:       rating.UserID,
 			OrderID:      rating.OrderID,
-			CarID:        helper.UintValue(rating.CarID),
-			MotorcycleID: helper.UintValue(rating.MotorcycleID),
+			CarID:        rating.CarID,
+			MotorcycleID: rating.MotorcycleID,
 		})
 	}
 
@@ -208,8 +208,8 @@ func (h *ServiceHandler) GetAllRatingByCarID(w http.ResponseWriter, r *http.Requ
 			Rating:       rating.Rating,
 			UserID:       rating.UserID,
 			OrderID:      rating.OrderID,
-			CarID:        helper.UintValue(rating.CarID),
-			MotorcycleID: helper.UintValue(rating.MotorcycleID),
+			CarID:        rating.CarID,
+			MotorcycleID: rating.MotorcycleID,
 		})
 	}
 
@@ -260,8 +260,8 @@ func (h *ServiceHandler) GetAllRatingByMotorcycleID(w http.ResponseWriter, r *ht
 			Rating:       rating.Rating,
 			UserID:       rating.UserID,
 			OrderID:      rating.OrderID,
-			CarID:        helper.UintValue(rating.CarID),
-			MotorcycleID: helper.UintValue(rating.MotorcycleID),
+			CarID:        rating.CarID,
+			MotorcycleID: rating.MotorcycleID,
 		})
 	}
 
@@ -330,8 +330,8 @@ func (h *ServiceHandler) CreateNewRating(w http.ResponseWriter, r *http.Request)
 		Rating:       rating.Rating,
 		UserID:       rating.UserID,
 		OrderID:      rating.OrderID,
-		CarID:        helper.UintValue(rating.CarID),
-		MotorcycleID: helper.UintValue(rating.MotorcycleID),
+		CarID:        rating.CarID,
+		MotorcycleID: rating.MotorcycleID,
 	}
 
 	json.NewEncoder(w).Encode(models.APIResponse{
