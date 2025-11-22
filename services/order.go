@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/PeterAjaaa/setor_mobil_backend/dto"
 	"github.com/PeterAjaaa/setor_mobil_backend/helper"
@@ -48,17 +49,23 @@ func (h *ServiceHandler) GetOrderById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	loc, err := time.LoadLocation("Asia/Jakarta")
+
+	if err != nil {
+		helper.HttpErrorHelper(w, http.StatusInternalServerError, "Failed to load timezone", nil)
+	}
+
 	response = dto.OrderResponseRequest{
 		ID:           order.ID,
 		CreatedAt:    order.CreatedAt,
 		Duration:     order.Duration,
-		PickupTime:   order.PickupTime,
-		StartDate:    order.StartDate,
-		ReturnDate:   order.ReturnDate,
+		PickupTime:   order.PickupTime.In(loc),
+		StartDate:    order.StartDate.In(loc),
+		ReturnDate:   order.ReturnDate.In(loc),
 		Price:        order.Price,
 		Status:       order.Status,
-		CarID:        helper.UintValue(order.CarID),
-		MotorcycleID: helper.UintValue(order.MotorcycleID),
+		CarID:        order.CarID,
+		MotorcycleID: order.MotorcycleID,
 		UserID:       order.UserID,
 		Rating:       order.Rating,
 	}
@@ -104,18 +111,24 @@ func (h *ServiceHandler) GetAllOrdersByUserId(w http.ResponseWriter, r *http.Req
 		return
 	}
 
+	loc, err := time.LoadLocation("Asia/Jakarta")
+
+	if err != nil {
+		helper.HttpErrorHelper(w, http.StatusInternalServerError, "Failed to load timezone", nil)
+	}
+
 	for _, order := range orders {
 		response = append(response, dto.OrderResponseRequest{
 			ID:           order.ID,
 			CreatedAt:    order.CreatedAt,
 			Duration:     order.Duration,
-			PickupTime:   order.PickupTime,
-			StartDate:    order.StartDate,
-			ReturnDate:   order.ReturnDate,
+			PickupTime:   order.PickupTime.In(loc),
+			StartDate:    order.StartDate.In(loc),
+			ReturnDate:   order.ReturnDate.In(loc),
 			Price:        order.Price,
 			Status:       order.Status,
-			CarID:        helper.UintValue(order.CarID),
-			MotorcycleID: helper.UintValue(order.MotorcycleID),
+			CarID:        order.CarID,
+			MotorcycleID: order.MotorcycleID,
 			UserID:       order.UserID,
 			Rating:       order.Rating,
 		})
@@ -157,11 +170,17 @@ func (h *ServiceHandler) CreateNewOrder(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	loc, err := time.LoadLocation("Asia/Jakarta")
+
+	if err != nil {
+		helper.HttpErrorHelper(w, http.StatusInternalServerError, "Failed to load timezone", nil)
+	}
+
 	order := models.Orders{
 		Duration:     req.Duration,
-		PickupTime:   req.PickupTime,
-		StartDate:    req.StartDate,
-		ReturnDate:   req.ReturnDate,
+		PickupTime:   req.PickupTime.In(loc),
+		StartDate:    req.StartDate.In(loc),
+		ReturnDate:   req.ReturnDate.In(loc),
 		Price:        req.Price,
 		Status:       req.Status,
 		CarID:        req.CarID,
@@ -189,13 +208,13 @@ func (h *ServiceHandler) CreateNewOrder(w http.ResponseWriter, r *http.Request) 
 		ID:           order.ID,
 		CreatedAt:    order.CreatedAt,
 		Duration:     order.Duration,
-		PickupTime:   order.PickupTime,
-		StartDate:    order.StartDate,
-		ReturnDate:   order.ReturnDate,
+		PickupTime:   order.PickupTime.In(loc),
+		StartDate:    order.StartDate.In(loc),
+		ReturnDate:   order.ReturnDate.In(loc),
 		Price:        order.Price,
 		Status:       order.Status,
-		CarID:        helper.UintValue(order.CarID),
-		MotorcycleID: helper.UintValue(order.MotorcycleID),
+		CarID:        order.CarID,
+		MotorcycleID: order.MotorcycleID,
 		UserID:       order.UserID,
 	}
 
