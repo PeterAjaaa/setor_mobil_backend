@@ -16,7 +16,7 @@ import (
 
 func (h *ServiceHandler) GetMotorcyleById(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		helper.HttpErrorHelper(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
+		helper.SendHttpResponse(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
 		return
 	}
 
@@ -30,7 +30,7 @@ func (h *ServiceHandler) GetMotorcyleById(w http.ResponseWriter, r *http.Request
 	motorID, err := strconv.ParseUint(r.PathValue("id"), 10, 64)
 
 	if err != nil {
-		helper.HttpErrorHelper(w, http.StatusBadRequest, err.Error(), nil)
+		helper.SendHttpResponse(w, http.StatusBadRequest, err.Error(), nil)
 		logger.LOG.Error(err.Error())
 		return
 	}
@@ -38,17 +38,13 @@ func (h *ServiceHandler) GetMotorcyleById(w http.ResponseWriter, r *http.Request
 	result := h.DB.Preload("Orders").Preload("Ratings").First(&motor, motorID)
 
 	if result.Error != nil {
-		helper.HttpErrorHelper(w, http.StatusInternalServerError, result.Error.Error(), nil)
+		helper.SendHttpResponse(w, http.StatusInternalServerError, result.Error.Error(), nil)
 		logger.LOG.Error(result.Error.Error())
 		return
 	}
 
 	if result.RowsAffected == 0 {
-		json.NewEncoder(w).Encode(models.APIResponse{
-			Status:  http.StatusNotFound,
-			Message: fmt.Sprintf("No motorcycle with ID %d found", motorID),
-			Data:    nil,
-		})
+		helper.SendHttpResponse(w, http.StatusNotFound, fmt.Sprintf("No motorcycle with ID %d found", motorID), nil)
 		return
 	}
 
@@ -64,16 +60,12 @@ func (h *ServiceHandler) GetMotorcyleById(w http.ResponseWriter, r *http.Request
 		ImageURL:        motor.ImageURL,
 	}
 
-	json.NewEncoder(w).Encode(models.APIResponse{
-		Status:  http.StatusOK,
-		Message: fmt.Sprintf("Motorcycle ID %d is found!", motorID),
-		Data:    response,
-	})
+	helper.SendHttpResponse(w, http.StatusOK, fmt.Sprintf("Motorcycle ID %d is found!", motorID), response)
 }
 
 func (h *ServiceHandler) GetAllMotorcycles(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		helper.HttpErrorHelper(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
+		helper.SendHttpResponse(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
 		return
 	}
 
@@ -87,17 +79,13 @@ func (h *ServiceHandler) GetAllMotorcycles(w http.ResponseWriter, r *http.Reques
 	result := h.DB.Preload("Orders").Preload("Ratings").Find(&motors)
 
 	if result.Error != nil {
-		helper.HttpErrorHelper(w, http.StatusInternalServerError, result.Error.Error(), nil)
+		helper.SendHttpResponse(w, http.StatusInternalServerError, result.Error.Error(), nil)
 		logger.LOG.Error(result.Error.Error())
 		return
 	}
 
 	if result.RowsAffected == 0 {
-		json.NewEncoder(w).Encode(models.APIResponse{
-			Status:  http.StatusOK,
-			Message: "No motorcycles found",
-			Data:    nil,
-		})
+		helper.SendHttpResponse(w, http.StatusNotFound, "No motorcycles found", nil)
 		return
 	}
 
@@ -115,16 +103,12 @@ func (h *ServiceHandler) GetAllMotorcycles(w http.ResponseWriter, r *http.Reques
 		})
 	}
 
-	json.NewEncoder(w).Encode(models.APIResponse{
-		Status:  http.StatusOK,
-		Message: fmt.Sprintf("Found %d motorcycles", len(response)),
-		Data:    response,
-	})
+	helper.SendHttpResponse(w, http.StatusOK, fmt.Sprintf("Found %d motorcycles", len(response)), response)
 }
 
 func (h *ServiceHandler) CreateNewMotorcycle(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		helper.HttpErrorHelper(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
+		helper.SendHttpResponse(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
 		return
 	}
 
@@ -133,13 +117,13 @@ func (h *ServiceHandler) CreateNewMotorcycle(w http.ResponseWriter, r *http.Requ
 	var req dto.MotorcyleCreationRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		helper.HttpErrorHelper(w, http.StatusBadRequest, err.Error(), nil)
+		helper.SendHttpResponse(w, http.StatusBadRequest, err.Error(), nil)
 		logger.LOG.Error(err.Error())
 		return
 	}
 
 	if err := validator.Validate(&req); err != nil {
-		helper.HttpErrorHelper(w, http.StatusBadRequest, err.Error(), nil)
+		helper.SendHttpResponse(w, http.StatusBadRequest, err.Error(), nil)
 		logger.LOG.Error("Validation error: " + err.Error())
 		return
 	}
@@ -147,7 +131,7 @@ func (h *ServiceHandler) CreateNewMotorcycle(w http.ResponseWriter, r *http.Requ
 	adminID, ok := helper.GetUserID(r.Context())
 
 	if !ok {
-		helper.HttpErrorHelper(w, http.StatusUnauthorized, "Unauthorized", nil)
+		helper.SendHttpResponse(w, http.StatusUnauthorized, "Unauthorized", nil)
 		return
 	}
 
@@ -173,7 +157,7 @@ func (h *ServiceHandler) CreateNewMotorcycle(w http.ResponseWriter, r *http.Requ
 
 	if txErr != nil {
 		logger.LOG.Error("Error inserting data, transaction rolled back:")
-		helper.HttpErrorHelper(w, http.StatusInternalServerError, txErr.Error(), nil)
+		helper.SendHttpResponse(w, http.StatusInternalServerError, txErr.Error(), nil)
 		return
 	} else {
 		logger.LOG.Info("Successfully created a new motorcycle with transaction!")
@@ -190,11 +174,6 @@ func (h *ServiceHandler) CreateNewMotorcycle(w http.ResponseWriter, r *http.Requ
 		Description:     motor.Description,
 		ImageURL:        motor.ImageURL,
 	}
-	json.NewEncoder(w).Encode(
-		models.APIResponse{
-			Status:  http.StatusCreated,
-			Message: "Successfully created a new motorcycle!",
-			Data:    response,
-		})
 
+	helper.SendHttpResponse(w, http.StatusCreated, "Successfully created a new motorcycle!", response)
 }

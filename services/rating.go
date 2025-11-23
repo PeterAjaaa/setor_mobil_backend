@@ -16,7 +16,7 @@ import (
 
 func (h *ServiceHandler) GetRatingById(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		helper.HttpErrorHelper(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
+		helper.SendHttpResponse(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
 		return
 	}
 
@@ -30,7 +30,7 @@ func (h *ServiceHandler) GetRatingById(w http.ResponseWriter, r *http.Request) {
 	ratingID, err := strconv.ParseUint(r.PathValue("id"), 10, 64)
 
 	if err != nil {
-		helper.HttpErrorHelper(w, http.StatusBadRequest, err.Error(), nil)
+		helper.SendHttpResponse(w, http.StatusBadRequest, err.Error(), nil)
 		logger.LOG.Error(err.Error())
 		return
 	}
@@ -38,13 +38,13 @@ func (h *ServiceHandler) GetRatingById(w http.ResponseWriter, r *http.Request) {
 	result := h.DB.First(&rating, ratingID)
 
 	if result.Error != nil {
-		helper.HttpErrorHelper(w, http.StatusInternalServerError, result.Error.Error(), nil)
+		helper.SendHttpResponse(w, http.StatusInternalServerError, result.Error.Error(), nil)
 		logger.LOG.Error(result.Error.Error())
 		return
 	}
 
 	if result.RowsAffected == 0 {
-		helper.HttpErrorHelper(w, http.StatusNotFound, fmt.Sprintf("No rating with ID %d found", ratingID), nil)
+		helper.SendHttpResponse(w, http.StatusNotFound, fmt.Sprintf("No rating with ID %d found", ratingID), nil)
 		return
 	}
 
@@ -57,16 +57,12 @@ func (h *ServiceHandler) GetRatingById(w http.ResponseWriter, r *http.Request) {
 		MotorcycleID: rating.MotorcycleID,
 	}
 
-	json.NewEncoder(w).Encode(models.APIResponse{
-		Status:  http.StatusOK,
-		Message: fmt.Sprintf("Found order ID %d", ratingID),
-		Data:    response,
-	})
+	helper.SendHttpResponse(w, http.StatusOK, fmt.Sprintf("Found order ID %d", ratingID), response)
 }
 
 func (h *ServiceHandler) GetAllRatingByOrderID(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		helper.HttpErrorHelper(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
+		helper.SendHttpResponse(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
 		return
 	}
 
@@ -80,7 +76,7 @@ func (h *ServiceHandler) GetAllRatingByOrderID(w http.ResponseWriter, r *http.Re
 	orderID, err := strconv.ParseUint(r.PathValue("id"), 10, 64)
 
 	if err != nil {
-		helper.HttpErrorHelper(w, http.StatusBadRequest, err.Error(), nil)
+		helper.SendHttpResponse(w, http.StatusBadRequest, err.Error(), nil)
 		logger.LOG.Error(err.Error())
 		return
 	}
@@ -88,13 +84,13 @@ func (h *ServiceHandler) GetAllRatingByOrderID(w http.ResponseWriter, r *http.Re
 	result := h.DB.Where("order_id = ?", orderID).Find(&ratings)
 
 	if result.Error != nil {
-		helper.HttpErrorHelper(w, http.StatusInternalServerError, result.Error.Error(), nil)
+		helper.SendHttpResponse(w, http.StatusInternalServerError, result.Error.Error(), nil)
 		logger.LOG.Error(result.Error.Error())
 		return
 	}
 
 	if result.RowsAffected == 0 {
-		helper.HttpErrorHelper(w, http.StatusNotFound, fmt.Sprintf("No ratings for order ID %d found", orderID), nil)
+		helper.SendHttpResponse(w, http.StatusNotFound, fmt.Sprintf("No ratings for order ID %d found", orderID), nil)
 		return
 	}
 
@@ -109,16 +105,12 @@ func (h *ServiceHandler) GetAllRatingByOrderID(w http.ResponseWriter, r *http.Re
 		})
 	}
 
-	json.NewEncoder(w).Encode(models.APIResponse{
-		Status:  http.StatusOK,
-		Message: fmt.Sprintf("Found %d ratings for order ID %d", len(response), orderID),
-		Data:    response,
-	})
+	helper.SendHttpResponse(w, http.StatusOK, fmt.Sprintf("Found %d ratings for order ID %d", len(response), orderID), response)
 }
 
 func (h *ServiceHandler) GetAllRatingByUserID(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		helper.HttpErrorHelper(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
+		helper.SendHttpResponse(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
 		return
 	}
 
@@ -132,7 +124,7 @@ func (h *ServiceHandler) GetAllRatingByUserID(w http.ResponseWriter, r *http.Req
 	userID, err := strconv.ParseUint(r.PathValue("id"), 10, 64)
 
 	if err != nil {
-		helper.HttpErrorHelper(w, http.StatusBadRequest, err.Error(), nil)
+		helper.SendHttpResponse(w, http.StatusBadRequest, err.Error(), nil)
 		logger.LOG.Error(err.Error())
 		return
 	}
@@ -140,13 +132,13 @@ func (h *ServiceHandler) GetAllRatingByUserID(w http.ResponseWriter, r *http.Req
 	result := h.DB.Where("user_id = ?", userID).Find(&ratings)
 
 	if result.Error != nil {
-		helper.HttpErrorHelper(w, http.StatusInternalServerError, result.Error.Error(), nil)
+		helper.SendHttpResponse(w, http.StatusInternalServerError, result.Error.Error(), nil)
 		logger.LOG.Error(result.Error.Error())
 		return
 	}
 
 	if result.RowsAffected == 0 {
-		helper.HttpErrorHelper(w, http.StatusNotFound, fmt.Sprintf("No ratings by user ID %d found", userID), nil)
+		helper.SendHttpResponse(w, http.StatusNotFound, fmt.Sprintf("No ratings by user ID %d found", userID), nil)
 		return
 	}
 
@@ -161,16 +153,12 @@ func (h *ServiceHandler) GetAllRatingByUserID(w http.ResponseWriter, r *http.Req
 		})
 	}
 
-	json.NewEncoder(w).Encode(models.APIResponse{
-		Status:  http.StatusOK,
-		Message: fmt.Sprintf("Found %d ratings by user ID %d", len(response), userID),
-		Data:    response,
-	})
+	helper.SendHttpResponse(w, http.StatusOK, fmt.Sprintf("Found %d ratings by user ID %d", len(response), userID), response)
 }
 
 func (h *ServiceHandler) GetAllRatingByCarID(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		helper.HttpErrorHelper(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
+		helper.SendHttpResponse(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
 		return
 	}
 
@@ -184,7 +172,7 @@ func (h *ServiceHandler) GetAllRatingByCarID(w http.ResponseWriter, r *http.Requ
 	carID, err := strconv.ParseUint(r.PathValue("id"), 10, 64)
 
 	if err != nil {
-		helper.HttpErrorHelper(w, http.StatusBadRequest, err.Error(), nil)
+		helper.SendHttpResponse(w, http.StatusBadRequest, err.Error(), nil)
 		logger.LOG.Error(err.Error())
 		return
 	}
@@ -192,13 +180,13 @@ func (h *ServiceHandler) GetAllRatingByCarID(w http.ResponseWriter, r *http.Requ
 	result := h.DB.Where("car_id = ?", carID).Find(&ratings)
 
 	if result.Error != nil {
-		helper.HttpErrorHelper(w, http.StatusInternalServerError, result.Error.Error(), nil)
+		helper.SendHttpResponse(w, http.StatusInternalServerError, result.Error.Error(), nil)
 		logger.LOG.Error(result.Error.Error())
 		return
 	}
 
 	if result.RowsAffected == 0 {
-		helper.HttpErrorHelper(w, http.StatusNotFound, fmt.Sprintf("No ratings for car ID %d found", carID), nil)
+		helper.SendHttpResponse(w, http.StatusNotFound, fmt.Sprintf("No ratings for car ID %d found", carID), nil)
 		return
 	}
 
@@ -213,16 +201,12 @@ func (h *ServiceHandler) GetAllRatingByCarID(w http.ResponseWriter, r *http.Requ
 		})
 	}
 
-	json.NewEncoder(w).Encode(models.APIResponse{
-		Status:  http.StatusOK,
-		Message: fmt.Sprintf("Found %d ratings for car ID %d", len(response), carID),
-		Data:    response,
-	})
+	helper.SendHttpResponse(w, http.StatusOK, fmt.Sprintf("Found %d ratings for car ID %d", len(response), carID), response)
 }
 
 func (h *ServiceHandler) GetAllRatingByMotorcycleID(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		helper.HttpErrorHelper(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
+		helper.SendHttpResponse(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
 		return
 	}
 
@@ -236,7 +220,7 @@ func (h *ServiceHandler) GetAllRatingByMotorcycleID(w http.ResponseWriter, r *ht
 	motorID, err := strconv.ParseUint(r.PathValue("id"), 10, 64)
 
 	if err != nil {
-		helper.HttpErrorHelper(w, http.StatusBadRequest, err.Error(), nil)
+		helper.SendHttpResponse(w, http.StatusBadRequest, err.Error(), nil)
 		logger.LOG.Error(err.Error())
 		return
 	}
@@ -244,13 +228,13 @@ func (h *ServiceHandler) GetAllRatingByMotorcycleID(w http.ResponseWriter, r *ht
 	result := h.DB.Where("motorcycle_id = ?", motorID).Find(&ratings)
 
 	if result.Error != nil {
-		helper.HttpErrorHelper(w, http.StatusInternalServerError, result.Error.Error(), nil)
+		helper.SendHttpResponse(w, http.StatusInternalServerError, result.Error.Error(), nil)
 		logger.LOG.Error(result.Error.Error())
 		return
 	}
 
 	if result.RowsAffected == 0 {
-		helper.HttpErrorHelper(w, http.StatusNotFound, fmt.Sprintf("No ratings for motorcycle ID %d found", motorID), nil)
+		helper.SendHttpResponse(w, http.StatusNotFound, fmt.Sprintf("No ratings for motorcycle ID %d found", motorID), nil)
 		return
 	}
 
@@ -265,16 +249,12 @@ func (h *ServiceHandler) GetAllRatingByMotorcycleID(w http.ResponseWriter, r *ht
 		})
 	}
 
-	json.NewEncoder(w).Encode(models.APIResponse{
-		Status:  http.StatusOK,
-		Message: fmt.Sprintf("Found %d ratings for motorcycle ID %d", len(response), motorID),
-		Data:    response,
-	})
+	helper.SendHttpResponse(w, http.StatusOK, fmt.Sprintf("Found %d ratings for motorcycle ID %d", len(response), motorID), response)
 }
 
 func (h *ServiceHandler) CreateNewRating(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		helper.HttpErrorHelper(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
+		helper.SendHttpResponse(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
 		return
 	}
 
@@ -283,13 +263,13 @@ func (h *ServiceHandler) CreateNewRating(w http.ResponseWriter, r *http.Request)
 	var req dto.RatingCreationRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		helper.HttpErrorHelper(w, http.StatusBadRequest, err.Error(), nil)
+		helper.SendHttpResponse(w, http.StatusBadRequest, err.Error(), nil)
 		logger.LOG.Error(err.Error())
 		return
 	}
 
 	if err := validator.Validate(&req); err != nil {
-		helper.HttpErrorHelper(w, http.StatusBadRequest, err.Error(), nil)
+		helper.SendHttpResponse(w, http.StatusBadRequest, err.Error(), nil)
 		logger.LOG.Error("Validation error: " + err.Error())
 		return
 	}
@@ -297,7 +277,7 @@ func (h *ServiceHandler) CreateNewRating(w http.ResponseWriter, r *http.Request)
 	userID, ok := helper.GetUserID(r.Context())
 
 	if !ok {
-		helper.HttpErrorHelper(w, http.StatusUnauthorized, "Unauthorized", nil)
+		helper.SendHttpResponse(w, http.StatusUnauthorized, "Unauthorized", nil)
 		return
 	}
 
@@ -319,7 +299,7 @@ func (h *ServiceHandler) CreateNewRating(w http.ResponseWriter, r *http.Request)
 
 	if txErr != nil {
 		logger.LOG.Error("Error inserting data, transaction rolled back:")
-		helper.HttpErrorHelper(w, http.StatusInternalServerError, txErr.Error(), nil)
+		helper.SendHttpResponse(w, http.StatusInternalServerError, txErr.Error(), nil)
 		return
 	} else {
 		logger.LOG.Info("Successfully created a new rating with transaction!")
@@ -334,10 +314,5 @@ func (h *ServiceHandler) CreateNewRating(w http.ResponseWriter, r *http.Request)
 		MotorcycleID: rating.MotorcycleID,
 	}
 
-	json.NewEncoder(w).Encode(models.APIResponse{
-		Status:  http.StatusOK,
-		Message: "Successfully created a new rating",
-		Data:    response,
-	})
-
+	helper.SendHttpResponse(w, http.StatusOK, "Successfully created a new rating", response)
 }

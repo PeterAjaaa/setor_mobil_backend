@@ -25,7 +25,7 @@ func (h *AuthHandler) AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
-			helper.HttpErrorHelper(w, http.StatusUnauthorized, "Missing authorization header", nil)
+			helper.SendHttpResponse(w, http.StatusUnauthorized, "Missing authorization header", nil)
 			return
 		}
 
@@ -35,13 +35,13 @@ func (h *AuthHandler) AuthMiddleware(next http.Handler) http.Handler {
 		}, jwt.WithValidMethods([]string{"HS256"}))
 
 		if err != nil || !token.Valid {
-			helper.HttpErrorHelper(w, http.StatusUnauthorized, "Invalid token", nil)
+			helper.SendHttpResponse(w, http.StatusUnauthorized, "Invalid token", nil)
 			return
 		}
 
 		claims, ok := token.Claims.(jwt.MapClaims)
 		if !ok {
-			helper.HttpErrorHelper(w, http.StatusUnauthorized, "Invalid claims", nil)
+			helper.SendHttpResponse(w, http.StatusUnauthorized, "Invalid claims", nil)
 			return
 		}
 

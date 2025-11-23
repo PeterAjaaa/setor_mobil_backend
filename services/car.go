@@ -16,7 +16,7 @@ import (
 
 func (h *ServiceHandler) GetCarById(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		helper.HttpErrorHelper(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
+		helper.SendHttpResponse(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
 		return
 	}
 
@@ -30,7 +30,7 @@ func (h *ServiceHandler) GetCarById(w http.ResponseWriter, r *http.Request) {
 	carID, err := strconv.ParseUint(r.PathValue("id"), 10, 64)
 
 	if err != nil {
-		helper.HttpErrorHelper(w, http.StatusBadRequest, err.Error(), nil)
+		helper.SendHttpResponse(w, http.StatusBadRequest, err.Error(), nil)
 		logger.LOG.Error(err.Error())
 		return
 	}
@@ -38,13 +38,13 @@ func (h *ServiceHandler) GetCarById(w http.ResponseWriter, r *http.Request) {
 	result := h.DB.Preload("Orders").Preload("Ratings").First(&car, carID)
 
 	if result.Error != nil {
-		helper.HttpErrorHelper(w, http.StatusInternalServerError, result.Error.Error(), nil)
+		helper.SendHttpResponse(w, http.StatusInternalServerError, result.Error.Error(), nil)
 		logger.LOG.Error(result.Error.Error())
 		return
 	}
 
 	if result.RowsAffected == 0 {
-		helper.HttpErrorHelper(w, http.StatusNotFound, fmt.Sprintf("No car with ID %d found", carID), nil)
+		helper.SendHttpResponse(w, http.StatusNotFound, fmt.Sprintf("No car with ID %d found", carID), nil)
 		return
 	}
 
@@ -62,16 +62,12 @@ func (h *ServiceHandler) GetCarById(w http.ResponseWriter, r *http.Request) {
 		Ratings:         car.Ratings,
 	}
 
-	json.NewEncoder(w).Encode(models.APIResponse{
-		Status:  http.StatusOK,
-		Message: fmt.Sprintf("Car ID %d is found!", carID),
-		Data:    response,
-	})
+	helper.SendHttpResponse(w, http.StatusOK, fmt.Sprintf("Car ID %d is found!", carID), response)
 }
 
 func (h *ServiceHandler) GetAllCars(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		helper.HttpErrorHelper(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
+		helper.SendHttpResponse(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
 		return
 	}
 
@@ -85,13 +81,13 @@ func (h *ServiceHandler) GetAllCars(w http.ResponseWriter, r *http.Request) {
 	result := h.DB.Preload("Orders").Preload("Ratings").Find(&cars)
 
 	if result.Error != nil {
-		helper.HttpErrorHelper(w, http.StatusInternalServerError, result.Error.Error(), nil)
+		helper.SendHttpResponse(w, http.StatusInternalServerError, result.Error.Error(), nil)
 		logger.LOG.Error(result.Error.Error())
 		return
 	}
 
 	if result.RowsAffected == 0 {
-		helper.HttpErrorHelper(w, http.StatusNotFound, "No cars found", nil)
+		helper.SendHttpResponse(w, http.StatusNotFound, "No cars found", nil)
 		return
 	}
 
@@ -111,16 +107,12 @@ func (h *ServiceHandler) GetAllCars(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	json.NewEncoder(w).Encode(models.APIResponse{
-		Status:  http.StatusOK,
-		Message: fmt.Sprintf("Found %d cars", len(response)),
-		Data:    response,
-	})
+	helper.SendHttpResponse(w, http.StatusOK, fmt.Sprintf("Found %d cars", len(response)), response)
 }
 
 func (h *ServiceHandler) CreateNewCar(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		helper.HttpErrorHelper(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
+		helper.SendHttpResponse(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
 		return
 	}
 
@@ -129,13 +121,13 @@ func (h *ServiceHandler) CreateNewCar(w http.ResponseWriter, r *http.Request) {
 	var req dto.CarCreationRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		helper.HttpErrorHelper(w, http.StatusBadRequest, err.Error(), nil)
+		helper.SendHttpResponse(w, http.StatusBadRequest, err.Error(), nil)
 		logger.LOG.Error(err.Error())
 		return
 	}
 
 	if err := validator.Validate(&req); err != nil {
-		helper.HttpErrorHelper(w, http.StatusBadRequest, err.Error(), nil)
+		helper.SendHttpResponse(w, http.StatusBadRequest, err.Error(), nil)
 		logger.LOG.Error("Validation error: " + err.Error())
 		return
 	}
@@ -143,7 +135,7 @@ func (h *ServiceHandler) CreateNewCar(w http.ResponseWriter, r *http.Request) {
 	adminID, ok := helper.GetUserID(r.Context())
 
 	if !ok {
-		helper.HttpErrorHelper(w, http.StatusUnauthorized, "Unauthorized", nil)
+		helper.SendHttpResponse(w, http.StatusUnauthorized, "Unauthorized", nil)
 		return
 	}
 
@@ -169,7 +161,7 @@ func (h *ServiceHandler) CreateNewCar(w http.ResponseWriter, r *http.Request) {
 
 	if txErr != nil {
 		logger.LOG.Error("Error inserting data, transaction rolled back:")
-		helper.HttpErrorHelper(w, http.StatusInternalServerError, txErr.Error(), nil)
+		helper.SendHttpResponse(w, http.StatusInternalServerError, txErr.Error(), nil)
 		return
 	} else {
 		logger.LOG.Info("Successfully created a new car with transaction!")
@@ -187,10 +179,5 @@ func (h *ServiceHandler) CreateNewCar(w http.ResponseWriter, r *http.Request) {
 		ImageURL:        car.ImageURL,
 	}
 
-	json.NewEncoder(w).Encode(models.APIResponse{
-		Status:  http.StatusCreated,
-		Message: "Successfully created a new car!",
-		Data:    response,
-	})
-
+	helper.SendHttpResponse(w, http.StatusCreated, "Successfully created a new car!", response)
 }
