@@ -8,6 +8,8 @@ import (
 )
 
 func SendHttpResponse(w http.ResponseWriter, status int, msg string, data any) {
+	w.WriteHeader(status)
+
 	json.NewEncoder(w).Encode(
 		models.APIResponse{
 			Status:  status,
