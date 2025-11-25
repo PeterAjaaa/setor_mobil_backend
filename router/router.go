@@ -31,6 +31,7 @@ func Router() {
 	NewMux.HandleFunc("/register", services.RegisterUser)
 	NewMux.HandleFunc("/login", services.LoginUser)
 	NewMux.Handle("/users/{id}", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.GetUserById)))
+	NewMux.Handle("/users/count", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.GetUserCount)))
 
 	NewMux.Handle("/cars", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.GetAllCars)))
 	NewMux.Handle("/cars/{id}", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.GetCarById)))

@@ -59,6 +59,36 @@ func (h *ServiceHandler) GetUserById(w http.ResponseWriter, r *http.Request) {
 	logger.LOG.Debug(fmt.Sprintf("User ID %d is found!", user.ID))
 }
 
+func (h *ServiceHandler) GetUserCount(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		helper.SendHttpResponse(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	var count int64
+
+	logger.LOG.Debug("Getting user count in GetTotalUsers() function")
+
+	result := h.DB.Model(&models.Users{}).Count(&count)
+
+	if result.Error != nil {
+		helper.SendHttpResponse(w, http.StatusInternalServerError, result.Error.Error(), nil)
+		logger.LOG.Error(result.Error.Error())
+		return
+	}
+
+	if result.RowsAffected == 0 {
+		helper.SendHttpResponse(w, http.StatusNotFound, "No users found", nil)
+		return
+	}
+
+	helper.SendHttpResponse(w, http.StatusOK, fmt.Sprintf("Found %d users", count), count)
+
+	logger.LOG.Debug(fmt.Sprintf("Found %d users", count))
+}
+
 func RegisterUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		helper.SendHttpResponse(w, http.StatusMethodNotAllowed, "Method not allowed", nil)

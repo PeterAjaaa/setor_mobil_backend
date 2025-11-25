@@ -30,6 +30,8 @@
 - Add healthcheck endpoint for API
 - Add metrics endpoint for observability
 - Set service fee and insurance from backend
+- Add more endpoints as to not hack around using an endpoint for unintended use, possily leading to security holes (e.g. getting all users data just to get the count of total user)
+- Refactor endpoints to better reflect what they do (e.g. instead of /cars returning all cars, refactor to /cars/all to return all cars data)
 
 ## Flow for new feature addition
 
