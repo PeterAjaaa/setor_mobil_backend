@@ -133,6 +133,58 @@ func (h *ServiceHandler) GetAllOrdersByUserId(w http.ResponseWriter, r *http.Req
 	helper.SendHttpResponse(w, http.StatusOK, fmt.Sprintf("Found %d orders by user ID %d", len(response), userID), response)
 }
 
+func (h *ServiceHandler) GetAllOrders(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		helper.SendHttpResponse(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
+		return
+	}
+
+	logger.LOG.Debug("Getting all orders GetAllOrders() function...")
+
+	w.Header().Set("Content-Type", "application/json")
+
+	var orders []models.Orders
+	var response []dto.OrderResponseRequest
+
+	result := h.DB.Preload("Rating").Find(&orders)
+
+	if result.Error != nil {
+		helper.SendHttpResponse(w, http.StatusInternalServerError, result.Error.Error(), nil)
+		logger.LOG.Error(result.Error.Error())
+		return
+	}
+
+	if result.RowsAffected == 0 {
+		helper.SendHttpResponse(w, http.StatusNotFound, "No orders found", nil)
+		return
+	}
+
+	loc, err := time.LoadLocation("Asia/Jakarta")
+
+	if err != nil {
+		helper.SendHttpResponse(w, http.StatusInternalServerError, "Failed to load timezone", nil)
+	}
+
+	for _, order := range orders {
+		response = append(response, dto.OrderResponseRequest{
+			ID:           order.ID,
+			CreatedAt:    order.CreatedAt,
+			Duration:     order.Duration,
+			PickupTime:   order.PickupTime.In(loc),
+			StartDate:    order.StartDate.In(loc),
+			ReturnDate:   order.ReturnDate.In(loc),
+			Price:        order.Price,
+			Status:       order.Status,
+			CarID:        order.CarID,
+			MotorcycleID: order.MotorcycleID,
+			UserID:       order.UserID,
+			Rating:       order.Rating,
+		})
+	}
+
+	helper.SendHttpResponse(w, http.StatusOK, fmt.Sprintf("Found %d orders", len(response)), response)
+}
+
 func (h *ServiceHandler) CreateNewOrder(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		helper.SendHttpResponse(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
