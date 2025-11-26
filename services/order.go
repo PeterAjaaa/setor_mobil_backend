@@ -73,6 +73,59 @@ func (h *ServiceHandler) GetOrderById(w http.ResponseWriter, r *http.Request) {
 	helper.SendHttpResponse(w, http.StatusOK, fmt.Sprintf("Found order ID %d", orderID), response)
 }
 
+func (h *ServiceHandler) UpdateOrderStatusById(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPut {
+		helper.SendHttpResponse(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
+		return
+	}
+
+	logger.LOG.Debug("Updating order status in UpdateOrderStatusById() function...")
+	w.Header().Set("Content-Type", "application/json")
+
+	var order models.Orders
+	var req dto.OrderStatusUpdateRequest
+
+	orderID, err := strconv.ParseUint(r.PathValue("id"), 10, 64)
+	if err != nil {
+		helper.SendHttpResponse(w, http.StatusBadRequest, err.Error(), nil)
+		logger.LOG.Error(err.Error())
+		return
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		helper.SendHttpResponse(w, http.StatusBadRequest, "Invalid request body", nil)
+		logger.LOG.Error(err.Error())
+		return
+	}
+
+	if err := validator.Validate(&req); err != nil {
+		helper.SendHttpResponse(w, http.StatusBadRequest, "Validation failed: "+err.Error(), nil)
+		logger.LOG.Error(err.Error())
+		return
+	}
+
+	result := h.DB.First(&order, orderID)
+	if result.Error != nil {
+		helper.SendHttpResponse(w, http.StatusInternalServerError, result.Error.Error(), nil)
+		logger.LOG.Error(result.Error.Error())
+		return
+	}
+
+	if result.RowsAffected == 0 {
+		helper.SendHttpResponse(w, http.StatusNotFound, fmt.Sprintf("No order with ID %d found", orderID), nil)
+		return
+	}
+
+	order.Status = req.Status
+	if err := h.DB.Save(&order).Error; err != nil {
+		helper.SendHttpResponse(w, http.StatusInternalServerError, "Failed to update order status", nil)
+		logger.LOG.Error(err.Error())
+		return
+	}
+
+	helper.SendHttpResponse(w, http.StatusOK, fmt.Sprintf("Order #%d status updated to %s", orderID, req.Status), nil)
+}
+
 func (h *ServiceHandler) GetAllOrdersByUserId(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		helper.SendHttpResponse(w, http.StatusMethodNotAllowed, "Method not allowed", nil)

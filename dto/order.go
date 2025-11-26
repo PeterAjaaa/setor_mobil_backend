@@ -36,6 +36,10 @@ type OrderResponseRequest struct {
 	UserID       uint            `json:"user_id"`
 }
 
+type OrderStatusUpdateRequest struct {
+	Status string `json:"status" validate:"required,oneof=Active Pending Completed"`
+}
+
 func (o *OrderCreationRequest) Validate() error {
 	if o.CarID == nil && o.MotorcycleID == nil {
 		return errors.New("either car_id or motorcycle_id must be provided")

@@ -44,6 +44,7 @@ func Router() {
 	NewMux.Handle("/orders", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.GetAllOrders)))
 	NewMux.Handle("/orders/create", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.CreateNewOrder)))
 	NewMux.Handle("/orders/{id}", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.GetOrderById)))
+	NewMux.Handle("/orders/update/{id}", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.UpdateOrderStatusById)))
 	NewMux.Handle("/orders/user/{id}", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.GetAllOrdersByUserId)))
 
 	NewMux.Handle("/ratings/create", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.CreateNewRating)))
