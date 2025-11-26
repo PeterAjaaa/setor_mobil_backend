@@ -14,7 +14,7 @@ type OrderCreationRequest struct {
 	StartDate    time.Time `json:"start_date" validate:"required"`
 	ReturnDate   time.Time `json:"return_date" validate:"required"`
 	Price        uint32    `json:"price" validate:"required"`
-	Status       string    `json:"status" validate:"required,oneof=Active Pending Completed"`
+	Status       string    `json:"status" validate:"required,oneof=Active Pending Completed Cancelled"`
 	CarID        *uint     `json:"car_id,omitempty"`
 	MotorcycleID *uint     `json:"motorcycle_id,omitempty"`
 	// There isn't any UserID here, because UserID is automatically set up with context inside of the service
@@ -37,7 +37,7 @@ type OrderResponseRequest struct {
 }
 
 type OrderStatusUpdateRequest struct {
-	Status string `json:"status" validate:"required,oneof=Active Pending Completed"`
+	Status string `json:"status" validate:"required,oneof=Active Pending Completed Cancelled"`
 }
 
 func (o *OrderCreationRequest) Validate() error {
