@@ -181,3 +181,88 @@ func (h *ServiceHandler) CreateNewCar(w http.ResponseWriter, r *http.Request) {
 
 	helper.SendHttpResponse(w, http.StatusCreated, "Successfully created a new car!", response)
 }
+
+func (h *ServiceHandler) UpdateCarDetailById(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPut {
+		helper.SendHttpResponse(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
+		return
+	}
+
+	logger.LOG.Debug("Updating car details in UpdateCarDetailById() function...")
+	w.Header().Set("Content-Type", "application/json")
+
+	var car models.Cars
+	var req dto.CarDetailUpdateRequest
+
+	carID, err := strconv.ParseUint(r.PathValue("id"), 10, 64)
+	if err != nil {
+		helper.SendHttpResponse(w, http.StatusBadRequest, err.Error(), nil)
+		logger.LOG.Error(err.Error())
+		return
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		helper.SendHttpResponse(w, http.StatusBadRequest, "Invalid request body", nil)
+		logger.LOG.Error(err.Error())
+		return
+	}
+
+	if err := validator.Validate(&req); err != nil {
+		helper.SendHttpResponse(w, http.StatusBadRequest, "Validation failed: "+err.Error(), nil)
+		logger.LOG.Error(err.Error())
+		return
+	}
+
+	result := h.DB.First(&car, carID)
+	if result.Error != nil {
+		helper.SendHttpResponse(w, http.StatusInternalServerError, result.Error.Error(), nil)
+		logger.LOG.Error(result.Error.Error())
+		return
+	}
+
+	if result.RowsAffected == 0 {
+		helper.SendHttpResponse(w, http.StatusNotFound, fmt.Sprintf("No car with ID %d found", carID), nil)
+		return
+	}
+
+	err = h.DB.Transaction(func(tx *gorm.DB) error {
+		if req.RegistrationNum != "" {
+			car.RegistrationNum = req.RegistrationNum
+		}
+		if req.Brand != "" {
+			car.Brand = req.Brand
+		}
+		if req.Model != "" {
+			car.Model = req.Model
+		}
+		if req.Year > 0 {
+			car.Year = uint16(req.Year)
+		}
+		if req.PricePerDay > 0 {
+			car.PricePerDay = uint32(req.PricePerDay)
+		}
+		if req.Status != "" {
+			car.Status = req.Status
+		}
+		if req.ImageURL != "" {
+			car.ImageURL = req.ImageURL
+		}
+		if req.Description != "" {
+			car.Description = req.Description
+		}
+
+		if err := tx.Save(&car).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		helper.SendHttpResponse(w, http.StatusInternalServerError, "Failed to update car details", nil)
+		logger.LOG.Error(err.Error())
+		return
+	}
+
+	helper.SendHttpResponse(w, http.StatusOK, fmt.Sprintf("Car #%d details updated successfully", carID), nil)
+}

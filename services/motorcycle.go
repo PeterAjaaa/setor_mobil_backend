@@ -177,3 +177,89 @@ func (h *ServiceHandler) CreateNewMotorcycle(w http.ResponseWriter, r *http.Requ
 
 	helper.SendHttpResponse(w, http.StatusCreated, "Successfully created a new motorcycle!", response)
 }
+
+func (h *ServiceHandler) UpdateMotorcycleDetailById(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPut {
+		helper.SendHttpResponse(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
+		return
+	}
+
+	logger.LOG.Debug("Updating motorcycle details in UpdateMotorcycleDetailById() function...")
+	w.Header().Set("Content-Type", "application/json")
+
+	var motorcycle models.Motorcycles
+	var req dto.MotorcycleDetailUpdateRequest
+
+	motorcycleID, err := strconv.ParseUint(r.PathValue("id"), 10, 64)
+	if err != nil {
+		helper.SendHttpResponse(w, http.StatusBadRequest, err.Error(), nil)
+		logger.LOG.Error(err.Error())
+		return
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		helper.SendHttpResponse(w, http.StatusBadRequest, "Invalid request body", nil)
+		logger.LOG.Error(err.Error())
+		return
+	}
+
+	if err := validator.Validate(&req); err != nil {
+		helper.SendHttpResponse(w, http.StatusBadRequest, "Validation failed: "+err.Error(), nil)
+		logger.LOG.Error(err.Error())
+		return
+	}
+
+	result := h.DB.First(&motorcycle, motorcycleID)
+	if result.Error != nil {
+		helper.SendHttpResponse(w, http.StatusInternalServerError, result.Error.Error(), nil)
+		logger.LOG.Error(result.Error.Error())
+		return
+	}
+
+	if result.RowsAffected == 0 {
+		helper.SendHttpResponse(w, http.StatusNotFound, fmt.Sprintf("No motorcycle with ID %d found", motorcycleID), nil)
+		return
+	}
+
+	err = h.DB.Transaction(func(tx *gorm.DB) error {
+		// Update motorcycle details
+		if req.RegistrationNum != "" {
+			motorcycle.RegistrationNum = req.RegistrationNum
+		}
+		if req.Brand != "" {
+			motorcycle.Brand = req.Brand
+		}
+		if req.Model != "" {
+			motorcycle.Model = req.Model
+		}
+		if req.Year > 0 {
+			motorcycle.Year = req.Year
+		}
+		if req.PricePerDay > 0 {
+			motorcycle.PricePerDay = req.PricePerDay
+		}
+		if req.Status != "" {
+			motorcycle.Status = req.Status
+		}
+		if req.ImageURL != "" {
+			motorcycle.ImageURL = req.ImageURL
+		}
+		if req.Description != "" {
+			motorcycle.Description = req.Description
+		}
+
+		if err := tx.Save(&motorcycle).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		helper.SendHttpResponse(w, http.StatusInternalServerError, "Failed to update motorcycle details", nil)
+		logger.LOG.Error(err.Error())
+		return
+	}
+
+	helper.SendHttpResponse(w, http.StatusOK, fmt.Sprintf("Motorcycle #%d details updated successfully", motorcycleID), nil)
+}

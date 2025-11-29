@@ -11,7 +11,7 @@ type MotorcyleCreationRequest struct {
 	PricePerDay     uint32 `json:"price_per_day" validate:"required"`
 	Status          string `json:"status" validate:"required,oneof=Available Rented Maintenance"`
 	Description     string `json:"description"`
-	ImageURL        string `json:"image_url" validate:"required"`
+	ImageURL        string `json:"image_url" validate:"required,url"`
 }
 
 type MotorcycleResponseRequest struct {
@@ -25,4 +25,15 @@ type MotorcycleResponseRequest struct {
 	Description     string           `json:"description"`
 	ImageURL        string           `json:"image_url"`
 	Orders          *[]models.Orders `json:"orders"`
+}
+
+type MotorcycleDetailUpdateRequest struct {
+	RegistrationNum string `json:"registration_num,omitempty" validate:"omitempty,min=3"`
+	Brand           string `json:"brand,omitempty" validate:"omitempty"`
+	Model           string `json:"model,omitempty" validate:"omitempty"`
+	Year            uint16 `json:"year,omitempty" validate:"omitempty"`
+	PricePerDay     uint32 `json:"price_per_day,omitempty" validate:"omitempty"`
+	Status          string `json:"status,omitempty" validate:"omitempty,oneof=Available Rented Maintenance"`
+	Description     string `json:"description,omitempty" validate:"omitempty"`
+	ImageURL        string `json:"image_url,omitempty" validate:"omitempty,url"`
 }
