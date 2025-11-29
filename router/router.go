@@ -37,11 +37,13 @@ func Router() {
 	NewMux.Handle("/cars/{id}", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.GetCarById)))
 	NewMux.Handle("/cars/create", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.CreateNewCar)))
 	NewMux.Handle("/cars/update/{id}", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.UpdateCarDetailById)))
+	NewMux.Handle("/cars/delete/{id}", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.DeleteCarById)))
 
 	NewMux.Handle("/motorcycles", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.GetAllMotorcycles)))
 	NewMux.Handle("/motorcycles/{id}", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.GetMotorcyleById)))
 	NewMux.Handle("/motorcycles/create", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.CreateNewMotorcycle)))
 	NewMux.Handle("/motorcycles/update/{id}", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.UpdateMotorcycleDetailById)))
+	NewMux.Handle("/motorcycles/delete/{id}", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.DeleteMotorcycleById)))
 
 	NewMux.Handle("/orders", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.GetAllOrders)))
 	NewMux.Handle("/orders/create", serviceHandler.Auth.AuthMiddleware(http.HandlerFunc(serviceHandler.CreateNewOrder)))

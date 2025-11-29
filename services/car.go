@@ -266,3 +266,43 @@ func (h *ServiceHandler) UpdateCarDetailById(w http.ResponseWriter, r *http.Requ
 
 	helper.SendHttpResponse(w, http.StatusOK, fmt.Sprintf("Car #%d details updated successfully", carID), nil)
 }
+
+func (h *ServiceHandler) DeleteCarById(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodDelete {
+		helper.SendHttpResponse(w, http.StatusMethodNotAllowed, "Method not allowed", nil)
+		return
+	}
+
+	logger.LOG.Debug("Deleting car in DeleteCarById() function...")
+	w.Header().Set("Content-Type", "application/json")
+
+	var car models.Cars
+
+	carID, err := strconv.ParseUint(r.PathValue("id"), 10, 64)
+	if err != nil {
+		helper.SendHttpResponse(w, http.StatusBadRequest, err.Error(), nil)
+		logger.LOG.Error(err.Error())
+		return
+	}
+
+	result := h.DB.First(&car, carID)
+	if result.Error != nil {
+		helper.SendHttpResponse(w, http.StatusInternalServerError, result.Error.Error(), nil)
+		logger.LOG.Error(result.Error.Error())
+		return
+	}
+
+	if result.RowsAffected == 0 {
+		helper.SendHttpResponse(w, http.StatusNotFound, fmt.Sprintf("No car with ID %d found", carID), nil)
+		return
+	}
+
+	err = h.DB.Delete(&car).Error
+	if err != nil {
+		helper.SendHttpResponse(w, http.StatusInternalServerError, "Failed to delete car", nil)
+		logger.LOG.Error(err.Error())
+		return
+	}
+
+	helper.SendHttpResponse(w, http.StatusOK, fmt.Sprintf("Car #%d deleted successfully", carID), nil)
+}
