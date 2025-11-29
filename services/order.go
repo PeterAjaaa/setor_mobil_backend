@@ -116,8 +116,21 @@ func (h *ServiceHandler) UpdateOrderStatusById(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	order.Status = req.Status
-	if err := h.DB.Save(&order).Error; err != nil {
+	err = h.DB.Transaction(func(tx *gorm.DB) error {
+		order.Status = req.Status
+		if err := tx.Save(&order).Error; err != nil {
+			return err
+		}
+
+		vehicleStatus := helper.MapOrderStatusToVehicleStatus(req.Status)
+		if err := helper.UpdateVehicleStatus(tx, &order, vehicleStatus); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
 		helper.SendHttpResponse(w, http.StatusInternalServerError, "Failed to update order status", nil)
 		logger.LOG.Error(err.Error())
 		return
